@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Tarot App</title>
+    <style>
+        body { background: #0a0a0f; color: #e5e7eb; font-family: Arial; padding: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        h1 { color: #aa00ff; }
+        .test-section { background: rgba(255,255,255,0.05); padding: 20px; margin: 20px 0; border-radius: 8px; }
+        .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 10px; margin: 20px 0; }
+        .card { width: 80px; height: 120px; border: 1px solid #aa00ff; border-radius: 4px; overflow: hidden; }
+        .card img { width: 100%; height: 100%; object-fit: cover; }
+        .status { padding: 10px; margin: 10px 0; border-radius: 4px; }
+        .success { background: rgba(0,255,0,0.2); }
+        .error { background: rgba(255,0,0,0.2); }
+        pre { background: #000; padding: 10px; overflow-x: auto; font-size: 12px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔮 Tarot Talk - Test</h1>
+
+        <div class="test-section">
+            <h2>API Test - /api/all_cards</h2>
+            <div id="api-status" class="status"></div>
+            <pre id="api-response"></pre>
+        </div>
+
+        <div class="test-section">
+            <h2>Image Test - Card Back</h2>
+            <div id="image-status" class="status"></div>
+            <div style="width: 100px; height: 150px; border: 1px solid #00d4ff; overflow: hidden;">
+                <img id="test-image" src="/images/tarot/back.png" alt="Test" style="width: 100%; height: 100%; object-fit: cover;">
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>Cards Grid Test</h2>
+            <div id="grid-status" class="status"></div>
+            <div id="cards-grid" class="card-grid"></div>
+        </div>
+    </div>
+
+    <script>
+        // Test 1: API
+        console.log('Starting API test...');
+        fetch('http://localhost:8000/api/all_cards')
+            .then(res => res.json())
+            .then(data => {
+                const count = data.cards ? data.cards.length : 0;
+                document.getElementById('api-status').innerHTML = `<span class="success">✓ API working - ${count} cards received</span>`;
+                document.getElementById('api-response').textContent = JSON.stringify(data.cards.slice(0, 3), null, 2);
+                
+                // Test 2: Render cards
+                const grid = document.getElementById('cards-grid');
+                data.cards.slice(0, 12).forEach(card => {
+                    const cardEl = document.createElement('div');
+                    cardEl.className = 'card';
+                    cardEl.innerHTML = `<img src="/images/tarot/${card.suit}/${card.image}" alt="${card.name}" title="${card.name}">`;
+                    grid.appendChild(cardEl);
+                });
+                document.getElementById('grid-status').innerHTML = `<span class="success">✓ Grid rendered with 12 sample cards</span>`;
+            })
+            .catch(err => {
+                document.getElementById('api-status').innerHTML = `<span class="error">✗ Error: ${err.message}</span>`;
+                console.error('API Error:', err);
+            });
+
+        // Test 3: Image loading
+        const testImg = document.getElementById('test-image');
+        testImg.onload = () => {
+            document.getElementById('image-status').innerHTML = `<span class="success">✓ Card back image loaded successfully</span>`;
+        };
+        testImg.onerror = () => {
+            document.getElementById('image-status').innerHTML = `<span class="error">✗ Failed to load card back image</span>`;
+        };
+    </script>
+</body>
+</html>

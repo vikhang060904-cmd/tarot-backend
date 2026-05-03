@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard - Tarot SaaS</title>
+
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Chart -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        body {
+            background: #0f172a;
+        }
+    </style>
+</head>
+
+<body class="text-white">
+
+<div class="flex h-screen">
+
+    <!-- SIDEBAR -->
+    <div class="w-64 bg-slate-900 p-5">
+        <h1 class="text-2xl font-bold mb-6">🔮 Admin</h1>
+
+        <ul class="space-y-3">
+            <li class="hover:text-purple-400 cursor-pointer">Dashboard</li>
+            <li class="hover:text-purple-400 cursor-pointer">Users</li>
+            <li class="hover:text-purple-400 cursor-pointer">Orders</li>
+            <li class="hover:text-purple-400 cursor-pointer">Revenue</li>
+        </ul>
+    </div>
+
+    <!-- MAIN -->
+    <div class="flex-1 p-6 overflow-y-auto">
+
+        <!-- HEADER -->
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-3xl font-bold">Dashboard</h2>
+            <span id="nowTime"></span>
+        </div>
+
+        <!-- STATS -->
+        <div class="grid grid-cols-4 gap-4 mb-6">
+
+            <div class="bg-slate-800 p-5 rounded-xl">
+                <p class="text-gray-400">Users</p>
+                <h2 id="usersCount" class="text-2xl font-bold">0</h2>
+            </div>
+
+            <div class="bg-slate-800 p-5 rounded-xl">
+                <p class="text-gray-400">Orders</p>
+                <h2 id="ordersCount" class="text-2xl font-bold">0</h2>
+            </div>
+
+            <div class="bg-slate-800 p-5 rounded-xl">
+                <p class="text-gray-400">Revenue</p>
+                <h2 id="revenue" class="text-2xl font-bold">0đ</h2>
+            </div>
+
+            <div class="bg-slate-800 p-5 rounded-xl">
+                <p class="text-gray-400">Active Users</p>
+                <h2 id="activeUsers" class="text-2xl font-bold">0</h2>
+            </div>
+
+        </div>
+
+        <!-- CHART -->
+        <div class="bg-slate-800 p-5 rounded-xl mb-6">
+            <canvas id="revenueChart"></canvas>
+        </div>
+
+        <!-- TABLE -->
+        <div class="bg-slate-800 p-5 rounded-xl">
+            <h3 class="mb-3 font-bold">Latest Orders</h3>
+
+            <table class="w-full text-sm">
+                <thead>
+                    <tr class="text-gray-400">
+                        <th>ID</th>
+                        <th>Email</th>
+                        <th>Package</th>
+                        <th>Price</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+
+                <tbody id="ordersTable"></tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
+
+<script>
+const API = "http://127.0.0.1:8002"
+
+// TIME
+setInterval(()=>{
+    document.getElementById("nowTime").innerText = new Date().toLocaleString()
+},1000)
+
+// LOAD DATA
+async function loadDashboard(){
+
+    // ⚠️ fake demo (bạn có thể làm API thật sau)
+    let orders = []
+
+    for(let i=1;i<=5;i++){
+        try{
+            let res = await fetch(API + "/api/payments/order/" + i)
+            let data = await res.json()
+            if(data.success) orders.push(data)
+        }catch(e){}
+    }
+
+    // STATS
+    document.getElementById("ordersCount").innerText = orders.length
+
+    let revenue = orders.reduce((sum,o)=>sum + (o.price_vnd||0),0)
+    document.getElementById("revenue").innerText = revenue.toLocaleString() + "đ"
+
+    // TABLE
+    let html = ""
+    orders.forEach(o=>{
+        html += `
+        <tr class="border-t border-slate-700">
+            <td>${o.id}</td>
+            <td>${o.user_email}</td>
+            <td>${o.package_name}</td>
+            <td>${o.price_vnd}</td>
+            <td class="${o.status=='paid'?'text-green-400':'text-yellow-400'}">${o.status}</td>
+        </tr>
+        `
+    })
+    document.getElementById("ordersTable").innerHTML = html
+
+    // CHART
+    const ctx = document.getElementById('revenueChart');
+
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: orders.map(o=>"Order "+o.id),
+            datasets: [{
+                label: 'Revenue',
+                data: orders.map(o=>o.price_vnd),
+                borderWidth: 2
+            }]
+        }
+    });
+}
+
+loadDashboard()
+</script>
+
+</body>
+</html>

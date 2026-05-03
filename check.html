@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+
+
+<html lang="vi">
+    
+<head>
+    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kiểm Tra Tarot Talk</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #0a0a0f;
+            color: #e5e7eb;
+            font-family: 'Inter', sans-serif;
+            padding: 20px;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        h1 { color: #aa00ff; margin-bottom: 20px; font-size: 2em; }
+        .test-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+        .test-card {
+            background: rgba(170, 0, 255, 0.1);
+            border: 2px solid #aa00ff;
+            border-radius: 8px;
+            padding: 20px;
+        }
+        .test-card h2 { color: #00d4ff; margin-bottom: 10px; font-size: 1.2em; }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .success { background: rgba(0, 255, 100, 0.2); color: #00ff64; }
+        .error { background: rgba(255, 0, 100, 0.2); color: #ff3366; }
+        .loading { background: rgba(255, 165, 0, 0.2); color: #ffa500; }
+        pre {
+            background: #000;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-size: 12px;
+            margin: 10px 0;
+        }
+        .progress-bar { background: rgba(0,0,0,0.3); height: 20px; border-radius: 4px; overflow: hidden; }
+        .progress { background: linear-gradient(90deg, #aa00ff, #00d4ff); height: 100%; transition: width 0.3s; }
+        button {
+            background: linear-gradient(135deg, #aa00ff, #00d4ff);
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        button:hover { transform: translateY(-2px); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔮 Kiểm Tra Tarot Talk</h1>
+
+        <div class="test-grid">
+            <!-- API Test -->
+            <div class="test-card">
+                <h2>1️⃣ API All Cards</h2>
+                <div id="api-status" class="status loading">Đang kiểm tra...</div>
+                <button onclick="testAllCards()">Test Lại</button>
+            </div>
+
+            <!-- Image Test -->
+            <div class="test-card">
+                <h2>2️⃣ Hình Ảnh</h2>
+                <div id="image-status" class="status loading">Đang kiểm tra...</div>
+                <img id="test-img" src="/images/tarot/back.png" style="width: 100px; height: 150px; border-radius: 4px; margin-top: 10px;">
+                <button onclick="testImages()">Test Lại</button>
+            </div>
+
+            <!-- UI Test -->
+            <div class="test-card">
+                <h2>3️⃣ Giao Diện</h2>
+                <div id="ui-status" class="status loading">Đang kiểm tra...</div>
+                <button onclick="testUI()">Mở App</button>
+            </div>
+
+            <!-- Full Flow Test -->
+            <div class="test-card">
+                <h2>4️⃣ Quy Trình Đầy Đủ</h2>
+                <div id="flow-status" class="status loading">Sẵn sàng</div>
+                <div class="progress-bar"><div class="progress" style="width: 0%" id="progress"></div></div>
+                <button onclick="testFullFlow()">Test Quy Trình</button>
+            </div>
+        </div>
+
+        <div style="margin-top: 40px; padding: 20px; background: rgba(0,212,255,0.1); border-radius: 8px; border: 2px solid #00d4ff;">
+            <h2 style="color: #00d4ff; margin-bottom: 10px;">📊 Kết Quả Tóm Tắt</h2>
+            <div id="summary" style="font-size: 1.1em;"></div>
+        </div>
+    </div>
+
+    <script>
+        const API = "http://127.0.0.1:8002";
+        const setProgress = (percent) => {
+            document.getElementById('progress').style.width = percent + '%';
+        };
+
+        const updateStatus = (elementId, status, message) => {
+            const el = document.getElementById(elementId);
+            el.className = 'status ' + status;
+            el.textContent = message;
+        };
+
+        const testAllCards = async () => {
+            updateStatus('api-status', 'loading', '⏳ Đang kết nối...');
+            try {
+                const res = await fetch(`${API}/api/all_cards`);
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                const data = await res.json();
+                const count = data.cards ? data.cards.length : 0;
+                updateStatus('api-status', 'success', `✅ Thành công - ${count} lá bài`);
+                return true;
+            } catch (e) {
+                updateStatus('api-status', 'error', `❌ Lỗi: ${e.message}`);
+                return false;
+            }
+        };
+
+        const testImages = () => {
+            updateStatus('image-status', 'loading', '⏳ Đang tải...');
+            const img = document.getElementById('test-img');
+            img.onload = () => updateStatus('image-status', 'success', '✅ Hình ảnh tải thành công');
+            img.onerror = () => updateStatus('image-status', 'error', '❌ Lỗi tải hình ảnh');
+            img.src = '/images/tarot/back.png?' + Date.now();
+        };
+
+        const testUI = () => {
+            window.location.href = '/';
+        };
+
+        const testFullFlow = async () => {
+            setProgress(0);
+            updateStatus('flow-status', 'loading', '⏳ Bước 1: Lấy bài từ API...');
+
+            try {
+                // Step 1: Get cards
+                setProgress(20);
+                const cardsRes = await fetch('/api/all_cards');
+                if (!cardsRes.ok) throw new Error('API cards failed');
+                const cardsData = await cardsRes.json();
+                if (cardsData.cards.length !== 56) throw new Error('Expected 56 cards');
+                
+                // Step 2: Get card meaning
+                setProgress(40);
+                updateStatus('flow-status', 'loading', '⏳ Bước 2: Kiểm tra ý nghĩa lá bài...');
+                const card = cardsData.cards[0];
+                const meaningRes = await fetch(`${API}/api/card_meaning`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({name: card.name, role: 'Present'})
+                });
+                if (!meaningRes.ok) throw new Error('Meaning API failed');
+                const meaning = await meaningRes.json();
+                if (!meaning.answer) throw new Error('No answer from meaning API');
+
+                // Step 3: Get tarot reading
+                setProgress(60);
+                updateStatus('flow-status', 'loading', '⏳ Bước 3: Lấy đọc Tarot...');
+                const c1 = cardsData.cards[0];
+                const c2 = cardsData.cards[1];
+                const c3 = cardsData.cards[2];
+                const readingRes = await fetch(`${API}/api/tarot`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        question: 'Test',
+                        cards: [
+                            {name: c1.name, suit: c1.suit, image: c1.image},
+                            {name: c2.name, suit: c2.suit, image: c2.image},
+                            {name: c3.name, suit: c3.suit, image: c3.image}
+                        ]
+                    })
+                });
+                if (!readingRes.ok) throw new Error('Tarot API failed');
+                const reading = await readingRes.json();
+                if (!reading.answer) throw new Error('No reading received');
+
+                setProgress(100);
+                updateStatus('flow-status', 'success', '✅ Tất cả bước hoàn thành!');
+                document.getElementById('summary').innerHTML = `
+                    <p>✅ API All Cards: 56 lá bài</p>
+                    <p>✅ Card Meaning: Hoạt động</p>
+                    <p>✅ Tarot Reading: Hoạt động</p>
+                    <p style="margin-top: 10px; color: #00ff64;">🎉 Ứng dụng sẵn sàng sử dụng!</p>
+                `;
+                return true;
+            } catch (e) {
+                setProgress(0);
+                updateStatus('flow-status', 'error', `❌ Lỗi: ${e.message}`);
+                document.getElementById('summary').innerHTML = `<p style="color: #ff3366;">Có lỗi trong quy trình: ${e.message}</p>`;
+                return false;
+            }
+        };
+
+        // Auto-test on load
+        window.addEventListener('load', async () => {
+            await testAllCards();
+            testImages();
+            updateStatus('ui-status', 'success', '✅ Sẵn sàng');
+            await new Promise(r => setTimeout(r, 1000));
+            await testFullFlow();
+        });
+    </script>
+</body>
+</html>
