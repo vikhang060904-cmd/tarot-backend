@@ -222,13 +222,19 @@
     const [time, setTime] = useState(0);
     const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
     const boardRef = useRef<HTMLDivElement | null>(null);
-   
-  
+    const [floatingCards, setFloatingCards] = useState(
+  Array.from({ length: 6 }, (_, i) => ({
+    id: i,
+    angle: Math.random() * Math.PI * 2,
+    radius: 520 + Math.random() * 180,
+    speed: 0.002 + Math.random() * 0.002,
+  }))
+);
     useEffect(() => {
     let raf: number;
 
     const loop = () => {
-      setTime(Date.now() / 6000);
+      setTime(Date.now() / 8000);
       raf = requestAnimationFrame(loop);
     };
 
@@ -236,7 +242,38 @@
 
     return () => cancelAnimationFrame(raf);
   }, []);
+  useEffect(() => {
+  let raf: number;
 
+  const animate = () => {
+    setFloatingCards(prev =>
+      prev.map(card => {
+        const newAngle = card.angle + card.speed;
+        const newRadius = card.radius - 0.8;
+
+        // 🔥 bay vào tâm rồi reset
+        if (newRadius < 180) {
+          return {
+            ...card,
+            angle: Math.random() * Math.PI * 2,
+            radius: 520 + Math.random() * 180,
+          };
+        }
+
+        return {
+          ...card,
+          angle: newAngle,
+          radius: newRadius,
+        };
+      })
+    );
+
+    raf = requestAnimationFrame(animate);
+  };
+
+  animate();
+  return () => cancelAnimationFrame(raf);
+}, []);
     useEffect(() => {
     if (!conversationId) return;
 
@@ -836,7 +873,6 @@
 
       const board = boardRef.current;
       if (!board) return;
-      board.classList.add("has-selected")
 
       const button = event.currentTarget;
       const buttonRect = button.getBoundingClientRect();
@@ -844,8 +880,6 @@
       const cardKey = `${card.index ?? "x"}-${card.name}`;
 
       spawnBurst(event);
-      document.body.classList.add("cinematic")
-setTimeout(()=>document.body.classList.remove("cinematic"),1200)
 
       setFlyingCard({
         left: buttonRect.left - boardRect.left,
@@ -867,8 +901,6 @@ setTimeout(()=>document.body.classList.remove("cinematic"),1200)
     };
 
     const handleConfirm = () => {
-      document.body.style.filter = "brightness(1.05)"
-      setTimeout(()=>document.body.style.filter = "", 800)
       if (requireLogin()) return;
       if (isPicking || busy) return;
       onConfirm();
@@ -911,10 +943,10 @@ setTimeout(()=>document.body.classList.remove("cinematic"),1200)
             zIndex: 0,
             pointerEvents: "none",
             background: `
-  radial-gradient(ellipse 70% 55% at 15% 85%, rgba(80,10,120,0.12), transparent 55%),
-  radial-gradient(ellipse 60% 45% at 85% 15%, rgba(40,5,90,0.1), transparent 55%),
-  radial-gradient(circle at 50% 50%, rgba(120,40,200,0.08), transparent 60%)
-`,  
+  radial-gradient(ellipse 70% 55% at 15% 85%, rgba(80,10,120,0.65), transparent 55%),
+  radial-gradient(ellipse 60% 45% at 85% 15%, rgba(40,5,90,0.6), transparent 55%),
+             radial-gradient(circle at 50% 50%, rgba(120,40,200,0.25), transparent 60%)
+            `,  
             animation: "tp-nebula 22s ease-in-out infinite alternate",
           }}
         />
@@ -1026,19 +1058,45 @@ setTimeout(()=>document.body.classList.remove("cinematic"),1200)
                     }}
                   >
                     {/* ===== FLOATING CARDS ===== */}
+{floatingCards.map(card => {
+  const x = Math.cos(card.angle) * card.radius;
+  const y = Math.sin(card.angle) * card.radius;
 
+  const dist = Math.sqrt(x * x + y * y);
+  const scale = dist < 220 ? 0.3 : 0.85;
+ const opacity = dist < 180 ? 0.25 : 0.85;
+
+  return (
+    <div
+      key={card.id}
+      className="floating-card"
+      style={{
+        transform: `
+          translate(-50%, -50%)
+          translateX(${x}px)
+          translateY(${y}px)
+          rotate(${card.angle * 60}deg)
+          scale(${scale})
+        `,
+        opacity
+      }}
+    >
+      <img src="/images/tarot/back.png" />
+    </div>
+  );
+})}
                     {/* 🔮 CRYSTAL BALL */}
   <div
     
     style={{
       position: "absolute",
       left: "50%",
-      top: "60%",
+      top: "55%",
       transform: "translate(-50%, -50%)",
       width: "220px",
       height: "220px",
       borderRadius: "50%",
-      zIndex: 100,
+      zIndex: 20,
       pointerEvents: "none",
 
       // 🔥 nền cầu
@@ -1076,101 +1134,89 @@ setTimeout(()=>document.body.classList.remove("cinematic"),1200)
       }}
     />
   </div>
-                  {/* ===== HORIZONTAL LINE ===== */}
-{visibleCards.slice(0, 6).map((card, i) => {
-  const progress = (time * 320 + i * 400) % (window.innerWidth + 600);
-  const x = progress - window.innerWidth / 2 - 300;
-
-  
-  const y = Math.sin(time * 2 + i) * 20;
-
-  return (
-    <div
-      key={"line-" + i}
-      className="horizontal-card"
-      style={{
-        ["--x"]: `${x}px`,
-        ["--y"]: `${y}px`,
-        ["--r"]: `0deg`,
-        ["--scale"]: 0.85,
-        opacity: 0.8,
-        zIndex: 5000,
-        pointerEvents: "none"
-      }}
-    >
-      <img src="/images/tarot/back.png" />
-    </div>
-  );
-})}
+                  
                       {visibleCards.slice(0, dealtCount).map((card, visibleIndex) => {
                       const isSelected = selectedCards.some((c) => c.index === card.index);
 
                     
+                    // 🔥 góc gốc
+
                    const total = visibleCards.length;
 
-const ring1Count = Math.floor(total * 0.4);
-const ring2Count = total - ring1Count;
+// chia 2 vòng
+const innerCount = Math.ceil(total * 0.28);   // vòng trong
+const outerCount = total - innerCount;        // vòng ngoài
 
-const isTopRing = visibleIndex < ring1Count;
+const isInner = visibleIndex < innerCount;
 
-const ringIndex = isTopRing ? visibleIndex : visibleIndex - ring1Count;
-const ringTotal = isTopRing ? ring1Count : ring2Count;
+// index từng vòng
+const ringIndex = isInner ? visibleIndex : visibleIndex - innerCount;
+const ringTotal = isInner ? innerCount : outerCount;
 
+// góc chia đều
 const angle = (ringIndex / ringTotal) * Math.PI * 2;
 
-// 🔥 quay ngược chiều
-const orbit = angle + time * (isTopRing ? 0.14 : -0.12);
+// xoay động
+const orbit = angle + time * (isInner ? 0.18 : 0.11);
 
-const radius = 260;
+// bán kính
+const radius = isInner ? 160 : 285;
 
+// vị trí
 const x = Math.cos(orbit) * radius;
-const y = Math.sin(orbit) * radius * 0.65 + (isTopRing ? -90 : 90);
+const y = Math.sin(orbit) * radius * 0.82;
 
+// chiều sâu
 const depth = (Math.sin(orbit) + 1) / 2;
 
-const scale = 0.8 + depth * 0.2;
-const rotate = orbit * 180 / Math.PI;
+// scale
+const scale = isInner
+  ? 0.78 + depth * 0.22
+  : 0.92 + depth * 0.18;
 
-const zIndex = 1000 + Math.floor(depth * 500);
-const brightness = 0.85 + depth * 0.4;
-const blur = (1 - depth) * 0.6;
+// xoay lá bài
+const rotate = orbit * 180 / Math.PI + 90;
+
+// layer
+const zIndex = isInner
+  ? 3000 + Math.floor(depth * 500)
+  : 1000 + Math.floor(depth * 500);
+
+// sáng
+const brightness = 0.8 + depth * 0.5;
+
+// blur
+const blur = (1 - depth) * 1.2;
 
                       
                       const dealDelay = visibleIndex * 25 + Math.random() * 120;
                      
                       const isHovered = hoveredIndex === visibleIndex;
-                     
+                      const hoverScale = isHovered ? 1.25 : 1;
+
                       return (
                         <button
     type="button"
     key={`${card.index}-${card.name}`}
     className="mystic-grid-card"
-    onMouseMove={(e) => {
-  const rect = e.currentTarget.getBoundingClientRect();
-  const x = ((e.clientX - rect.left) / rect.width) * 100;
-  const y = ((e.clientY - rect.top) / rect.height) * 100;
-
-  e.currentTarget.style.setProperty("--mx", x + "%");
-  e.currentTarget.style.setProperty("--my", y + "%");
-}}
     onClick={(e) => handleSelectCard(card, e, rotate)}
-    onMouseEnter={(e) => {
-  setHoveredIndex(visibleIndex)
-  e.currentTarget.classList.add("hovering")
-}}
-onMouseLeave={(e) => {
-  setHoveredIndex(null)
-  e.currentTarget.classList.remove("hovering")
-}}
-     
+    onMouseEnter={() => setHoveredIndex(visibleIndex)}
+     onMouseLeave={() => setHoveredIndex(null)}
     style={
       {
         ["--x" as string]: `${x}px`,
-["--y" as string]: `${y}px`,
-["--r" as string]: `${rotate}deg`,
-["--z" as string]: `${scale * 200}px`,
-["--scale" as string]: scale,
-
+        ["--y" as string]: `${y}px`,
+        ["--fromX" as string]: `0px`,
+        ["--fromY" as string]: `380px`,
+        ["--r" as string]: `${rotate}deg`,
+transform: `
+  translate(-50%, 50%)
+  translateX(${x}px)
+  translateY(${y}px)
+  translateZ(${scale * 200}px)
+  rotate(${rotate}deg)
+  scale(${scale * hoverScale})
+`,
   zIndex: isHovered ? 9999 : zIndex + Math.floor(depth * 400),
   opacity: 0.4 + depth * 0.6,
   filter: `
@@ -1178,7 +1224,8 @@ onMouseLeave={(e) => {
   blur(${blur}px)
   drop-shadow(0 0 ${isHovered ? 80 : 15}px rgba(192,96,255,1))
 `,
-        
+        ["--spiralX" as string]: `${x * 2.2}px`,
+        ["--spiralY" as string]: `${y * 1.8}px`,
         visibility: isSelected ? "hidden" : "visible",
         animation: `
   tp-cinematic-deal 1.4s cubic-bezier(0.16,1,0.3,1) ${dealDelay}ms forwards
