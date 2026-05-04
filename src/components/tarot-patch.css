@@ -446,3 +446,31 @@
 
   transition: transform .35s cubic-bezier(.2,.9,.2,1), filter .25s;
 }
+.horizontal-card {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform:
+    translate(-50%, -50%)
+    translateX(var(--x))
+    translateY(var(--y))
+    scale(var(--scale));
+  transition: transform 0.2s linear;
+}
+.mystic-grid-card.hovering {
+  z-index: 9999 !important;
+
+  transform:
+    translate(-50%, -50%)
+    translateX(var(--x))
+    translateY(calc(var(--y) - 40px))   /* 🔥 bay cao hơn */
+    scale(1.12)                         /* 🔥 scale mượt */
+    rotate(var(--r));
+
+  filter:
+    brightness(1.8)
+    drop-shadow(0 0 80px rgba(192,96,255,1))
+    drop-shadow(0 0 40px rgba(255,200,120,0.6));
+
+  transition: all 0.25s ease;
+}

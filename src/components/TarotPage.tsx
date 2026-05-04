@@ -222,14 +222,8 @@
     const [time, setTime] = useState(0);
     const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
     const boardRef = useRef<HTMLDivElement | null>(null);
-    const [floatingCards, setFloatingCards] = useState(
-  Array.from({ length: 6 }, (_, i) => ({
-    id: i,
-    angle: Math.random() * Math.PI * 2,
-    radius: 520 + Math.random() * 180,
-    speed: 0.002 + Math.random() * 0.002,
-  }))
-);
+   
+  
     useEffect(() => {
     let raf: number;
 
@@ -242,38 +236,7 @@
 
     return () => cancelAnimationFrame(raf);
   }, []);
-  useEffect(() => {
-  let raf: number;
 
-  const animate = () => {
-    setFloatingCards(prev =>
-      prev.map(card => {
-        const newAngle = card.angle + card.speed;
-        const newRadius = card.radius - 0.8;
-
-        // 🔥 bay vào tâm rồi reset
-        if (newRadius < 180) {
-          return {
-            ...card,
-            angle: Math.random() * Math.PI * 2,
-            radius: 520 + Math.random() * 180,
-          };
-        }
-
-        return {
-          ...card,
-          angle: newAngle,
-          radius: newRadius,
-        };
-      })
-    );
-
-    raf = requestAnimationFrame(animate);
-  };
-
-  animate();
-  return () => cancelAnimationFrame(raf);
-}, []);
     useEffect(() => {
     if (!conversationId) return;
 
@@ -1063,45 +1026,19 @@ setTimeout(()=>document.body.classList.remove("cinematic"),1200)
                     }}
                   >
                     {/* ===== FLOATING CARDS ===== */}
-{floatingCards.map(card => {
-  const x = Math.cos(card.angle) * card.radius;
-  const y = Math.sin(card.angle) * card.radius;
 
-  const dist = Math.sqrt(x * x + y * y);
-  const scale = dist < 220 ? 0.3 : 0.85;
- const opacity = dist < 180 ? 0.25 : 0.85;
-
-  return (
-    <div
-      key={card.id}
-      className="floating-card"
-      style={{
-        transform: `
-          translate(-50%, -50%)
-          translateX(${x}px)
-          translateY(${y}px)
-          rotate(${card.angle * 60}deg)
-          scale(${scale})
-        `,
-        opacity
-      }}
-    >
-      <img src="/images/tarot/back.png" />
-    </div>
-  );
-})}
                     {/* 🔮 CRYSTAL BALL */}
   <div
     
     style={{
       position: "absolute",
       left: "50%",
-      top: "55%",
+      top: "60%",
       transform: "translate(-50%, -50%)",
       width: "220px",
       height: "220px",
       borderRadius: "50%",
-      zIndex: 20,
+      zIndex: 100,
       pointerEvents: "none",
 
       // 🔥 nền cầu
@@ -1139,66 +1076,70 @@ setTimeout(()=>document.body.classList.remove("cinematic"),1200)
       }}
     />
   </div>
-                  
+                  {/* ===== HORIZONTAL LINE ===== */}
+{visibleCards.slice(0, 6).map((card, i) => {
+  const progress = (time * 320 + i * 400) % (window.innerWidth + 600);
+  const x = progress - window.innerWidth / 2 - 300;
+
+  
+  const y = Math.sin(time * 2 + i) * 20;
+
+  return (
+    <div
+      key={"line-" + i}
+      className="horizontal-card"
+      style={{
+        ["--x"]: `${x}px`,
+        ["--y"]: `${y}px`,
+        ["--r"]: `0deg`,
+        ["--scale"]: 0.85,
+        opacity: 0.8,
+        zIndex: 5000,
+        pointerEvents: "none"
+      }}
+    >
+      <img src="/images/tarot/back.png" />
+    </div>
+  );
+})}
                       {visibleCards.slice(0, dealtCount).map((card, visibleIndex) => {
                       const isSelected = selectedCards.some((c) => c.index === card.index);
 
                     
-                    // 🔥 góc gốc
-
                    const total = visibleCards.length;
 
-// chia 3 vòng
-const innerCount = Math.ceil(total * 0.18);   // vòng trong
-const middleCount = Math.ceil(total * 0.32);  // vòng giữa
-const outerCount = total - innerCount - middleCount; // vòng ngoài      // vòng ngoài
+const ring1Count = Math.floor(total * 0.4);
+const ring2Count = total - ring1Count;
 
-const isInner = visibleIndex < innerCount;
+const isTopRing = visibleIndex < ring1Count;
 
-// index từng vòng
-const ringIndex = isInner ? visibleIndex : visibleIndex - innerCount;
-const ringTotal = isInner ? innerCount : outerCount;
+const ringIndex = isTopRing ? visibleIndex : visibleIndex - ring1Count;
+const ringTotal = isTopRing ? ring1Count : ring2Count;
 
-// góc chia đều
-const angle = (ringIndex / ringTotal) * Math.PI * 2 * 1.15;
+const angle = (ringIndex / ringTotal) * Math.PI * 2;
 
-// xoay động
-const orbit = angle + time * (isInner ? 0.18 : 0.11);
+// 🔥 quay ngược chiều
+const orbit = angle + time * (isTopRing ? 0.14 : -0.12);
 
-// bán kính
-const radius = isInner ? 200 : 360;
-// vị trí
+const radius = 260;
+
 const x = Math.cos(orbit) * radius;
-const y = Math.sin(orbit) * radius * 0.82;
+const y = Math.sin(orbit) * radius * 0.65 + (isTopRing ? -90 : 90);
 
-// chiều sâu
 const depth = (Math.sin(orbit) + 1) / 2;
 
-// scale
-const scale = isInner
-  ? 0.78 + depth * 0.22
-  : 0.92 + depth * 0.18;
+const scale = 0.8 + depth * 0.2;
+const rotate = orbit * 180 / Math.PI;
 
-// xoay lá bài
-const rotate = orbit * 180 / Math.PI + 90;
-
-// layer
-const zIndex = isInner
-  ? 3000 + Math.floor(depth * 500)
-  : 1000 + Math.floor(depth * 500);
-
-// sáng
-const brightness = 0.8 + depth * 0.5;
-
-// blur
-const blur = (1 - depth) * 1.2;
+const zIndex = 1000 + Math.floor(depth * 500);
+const brightness = 0.85 + depth * 0.4;
+const blur = (1 - depth) * 0.6;
 
                       
                       const dealDelay = visibleIndex * 25 + Math.random() * 120;
                      
                       const isHovered = hoveredIndex === visibleIndex;
-                      const hoverScale = isHovered ? 1.25 : 1;
-
+                     
                       return (
                         <button
     type="button"
@@ -1227,8 +1168,8 @@ onMouseLeave={(e) => {
         ["--x" as string]: `${x}px`,
 ["--y" as string]: `${y}px`,
 ["--r" as string]: `${rotate}deg`,
-["--scale" as string]: scale * hoverScale,
 ["--z" as string]: `${scale * 200}px`,
+["--scale" as string]: scale,
 
   zIndex: isHovered ? 9999 : zIndex + Math.floor(depth * 400),
   opacity: 0.4 + depth * 0.6,
@@ -1237,8 +1178,7 @@ onMouseLeave={(e) => {
   blur(${blur}px)
   drop-shadow(0 0 ${isHovered ? 80 : 15}px rgba(192,96,255,1))
 `,
-        ["--spiralX" as string]: `${x * 2.2}px`,
-        ["--spiralY" as string]: `${y * 1.8}px`,
+        
         visibility: isSelected ? "hidden" : "visible",
         animation: `
   tp-cinematic-deal 1.4s cubic-bezier(0.16,1,0.3,1) ${dealDelay}ms forwards
