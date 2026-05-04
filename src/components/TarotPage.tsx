@@ -1225,18 +1225,11 @@ onMouseLeave={(e) => {
     style={
       {
         ["--x" as string]: `${x}px`,
-        ["--y" as string]: `${y}px`,
-        ["--fromX" as string]: `0px`,
-        ["--fromY" as string]: `380px`,
-        ["--r" as string]: `${rotate}deg`,
-transform: `
-  translate(-50%, -50%)
-  translateX(${x}px)
-  translateY(${y}px)
-  translateZ(${scale * 200}px)
-  rotate(${rotate}deg)
-  scale(${scale * hoverScale})
-`,
+["--y" as string]: `${y}px`,
+["--r" as string]: `${rotate}deg`,
+["--scale" as string]: scale * hoverScale,
+["--z" as string]: `${scale * 200}px`,
+
   zIndex: isHovered ? 9999 : zIndex + Math.floor(depth * 400),
   opacity: 0.4 + depth * 0.6,
   filter: `
