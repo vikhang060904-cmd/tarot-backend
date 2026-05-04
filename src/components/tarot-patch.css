@@ -28,18 +28,7 @@
 }
 
 /* ===== Hover ===== */
-.tarot-page .mystic-grid-card:hover {
-  transform:
-    translate(-50%, -50%)
-    translateX(var(--x))
-    translateY(calc(var(--y) - 20px))
-    rotate(var(--r))
-    scale(1.08)
-    rotateX(12deg)
-    rotateY(-6deg);
 
-  z-index: 999;
-}
 
 .tarot-page .mystic-grid-card:hover img{
   filter: brightness(1.4) contrast(1.1);
@@ -424,4 +413,36 @@
 
 .arc-spread-board.has-selected::after{
   opacity:1;
+}
+.mystic-grid-card {
+  transform:
+    translate(-50%, -50%)
+    translateX(var(--x))
+    translateY(var(--y))
+    translateZ(var(--z))
+    rotate(var(--r))
+    scale(var(--scale));
+}
+.tarot-page .mystic-grid-card{
+  position:absolute;
+  left:50%;
+  top:50%;
+  width:155px;
+  height:235px;
+
+  transform-origin:center; /* 🔥 FIX luôn */
+
+  transform:
+    translate(-50%, -50%)
+    translateX(var(--x))
+    translateY(var(--y))
+    translateZ(var(--z))
+    rotate(var(--r))
+    scale(var(--scale));
+
+  cursor:pointer;
+  border:none;
+  background:transparent;
+
+  transition: transform .35s cubic-bezier(.2,.9,.2,1), filter .25s;
 }
