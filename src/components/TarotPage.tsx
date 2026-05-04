@@ -904,7 +904,7 @@ setTimeout(()=>document.body.classList.remove("cinematic"),1200)
     };
 
     const handleConfirm = () => {
-      document.body.style.filter = "brightness(1.2) saturate(1.2)"
+      document.body.style.filter = "brightness(1.05)"
       setTimeout(()=>document.body.style.filter = "", 800)
       if (requireLogin()) return;
       if (isPicking || busy) return;
@@ -948,10 +948,10 @@ setTimeout(()=>document.body.classList.remove("cinematic"),1200)
             zIndex: 0,
             pointerEvents: "none",
             background: `
-  radial-gradient(ellipse 70% 55% at 15% 85%, rgba(80,10,120,0.65), transparent 55%),
-  radial-gradient(ellipse 60% 45% at 85% 15%, rgba(40,5,90,0.6), transparent 55%),
-             radial-gradient(circle at 50% 50%, rgba(120,40,200,0.25), transparent 60%)
-            `,  
+  radial-gradient(ellipse 70% 55% at 15% 85%, rgba(80,10,120,0.12), transparent 55%),
+  radial-gradient(ellipse 60% 45% at 85% 15%, rgba(40,5,90,0.1), transparent 55%),
+  radial-gradient(circle at 50% 50%, rgba(120,40,200,0.08), transparent 60%)
+`,  
             animation: "tp-nebula 22s ease-in-out infinite alternate",
           }}
         />
