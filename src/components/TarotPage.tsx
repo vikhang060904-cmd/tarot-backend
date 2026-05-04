@@ -1148,9 +1148,10 @@ setTimeout(()=>document.body.classList.remove("cinematic"),1200)
 
                    const total = visibleCards.length;
 
-// chia 2 vòng
-const innerCount = Math.ceil(total * 0.20);   // vòng trong
-const outerCount = total - innerCount;        // vòng ngoài
+// chia 3 vòng
+const innerCount = Math.ceil(total * 0.18);   // vòng trong
+const middleCount = Math.ceil(total * 0.32);  // vòng giữa
+const outerCount = total - innerCount - middleCount; // vòng ngoài      // vòng ngoài
 
 const isInner = visibleIndex < innerCount;
 
