@@ -1149,7 +1149,7 @@ setTimeout(()=>document.body.classList.remove("cinematic"),1200)
                    const total = visibleCards.length;
 
 // chia 2 vòng
-const innerCount = Math.ceil(total * 0.28);   // vòng trong
+const innerCount = Math.ceil(total * 0.20);   // vòng trong
 const outerCount = total - innerCount;        // vòng ngoài
 
 const isInner = visibleIndex < innerCount;
@@ -1159,14 +1159,13 @@ const ringIndex = isInner ? visibleIndex : visibleIndex - innerCount;
 const ringTotal = isInner ? innerCount : outerCount;
 
 // góc chia đều
-const angle = (ringIndex / ringTotal) * Math.PI * 2;
+const angle = (ringIndex / ringTotal) * Math.PI * 2 * 1.15;
 
 // xoay động
 const orbit = angle + time * (isInner ? 0.18 : 0.11);
 
 // bán kính
-const radius = isInner ? 160 : 285;
-
+const radius = isInner ? 200 : 360;
 // vị trí
 const x = Math.cos(orbit) * radius;
 const y = Math.sin(orbit) * radius * 0.82;
