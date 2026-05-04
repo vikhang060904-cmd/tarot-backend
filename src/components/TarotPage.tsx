@@ -234,7 +234,7 @@
     let raf: number;
 
     const loop = () => {
-      setTime(Date.now() / 8000);
+      setTime(Date.now() / 6000);
       raf = requestAnimationFrame(loop);
     };
 
@@ -873,6 +873,7 @@
 
       const board = boardRef.current;
       if (!board) return;
+      board.classList.add("has-selected")
 
       const button = event.currentTarget;
       const buttonRect = button.getBoundingClientRect();
@@ -880,6 +881,8 @@
       const cardKey = `${card.index ?? "x"}-${card.name}`;
 
       spawnBurst(event);
+      document.body.classList.add("cinematic")
+setTimeout(()=>document.body.classList.remove("cinematic"),1200)
 
       setFlyingCard({
         left: buttonRect.left - boardRect.left,
@@ -901,6 +904,8 @@
     };
 
     const handleConfirm = () => {
+      document.body.style.filter = "brightness(1.2) saturate(1.2)"
+      setTimeout(()=>document.body.style.filter = "", 800)
       if (requireLogin()) return;
       if (isPicking || busy) return;
       onConfirm();
@@ -1199,9 +1204,24 @@ const blur = (1 - depth) * 1.2;
     type="button"
     key={`${card.index}-${card.name}`}
     className="mystic-grid-card"
+    onMouseMove={(e) => {
+  const rect = e.currentTarget.getBoundingClientRect();
+  const x = ((e.clientX - rect.left) / rect.width) * 100;
+  const y = ((e.clientY - rect.top) / rect.height) * 100;
+
+  e.currentTarget.style.setProperty("--mx", x + "%");
+  e.currentTarget.style.setProperty("--my", y + "%");
+}}
     onClick={(e) => handleSelectCard(card, e, rotate)}
-    onMouseEnter={() => setHoveredIndex(visibleIndex)}
-     onMouseLeave={() => setHoveredIndex(null)}
+    onMouseEnter={(e) => {
+  setHoveredIndex(visibleIndex)
+  e.currentTarget.classList.add("hovering")
+}}
+onMouseLeave={(e) => {
+  setHoveredIndex(null)
+  e.currentTarget.classList.remove("hovering")
+}}
+     
     style={
       {
         ["--x" as string]: `${x}px`,
@@ -1210,7 +1230,7 @@ const blur = (1 - depth) * 1.2;
         ["--fromY" as string]: `380px`,
         ["--r" as string]: `${rotate}deg`,
 transform: `
-  translate(-50%, 50%)
+  translate(-50%, -50%)
   translateX(${x}px)
   translateY(${y}px)
   translateZ(${scale * 200}px)
