@@ -55,10 +55,7 @@
 
   animation: floatCard 1.8s ease-in-out infinite;
 }
-.arc-spread-board {
-  perspective: 1200px;
-  transform-style: preserve-3d;
-}
+
 /* aura */
 .tarot-page .mystic-grid-card.selected::before{
   content:"";
@@ -193,8 +190,10 @@
   animation: floatingGlow 2.5s ease-in-out infinite;
 }
 .arc-spread-board{
-  position:relative;
-  z-index:10;
+  position: relative;
+  z-index: 10;
+  perspective: 1200px;
+  transform-style: preserve-3d;
 }
 @keyframes floatingGlow{
   0%,100%{
@@ -227,18 +226,7 @@
   backdrop-filter: blur(8px);
 
   animation: ballPulse 4s ease-in-out infinite;
-  @keyframes suction{
-  0%,100%{
-    box-shadow:
-      inset 0 0 60px rgba(160,80,255,.6),
-      0 0 80px rgba(160,80,255,.7);
-  }
-  50%{
-    box-shadow:
-      inset 0 0 120px rgba(200,100,255,1),
-      0 0 160px rgba(200,100,255,.9);
-  }
-}
+ 
 }
 .crystal-ball::before{
   content:"";
@@ -288,5 +276,32 @@
   }
   50%{
     transform: translate(-50%, -50%) scale(1.05);
+  }
+}
+.mystic-beam {
+  position: absolute;
+  width: 2px;
+  height: 200px;
+  background: linear-gradient(to top, rgba(192,96,255,0.8), transparent);
+  filter: blur(2px);
+  transform-origin: bottom;
+  pointer-events: none;
+  animation: pulseBeam 1.2s infinite;
+}
+
+@keyframes pulseBeam {
+  0%,100% { opacity: 0.3; }
+  50% { opacity: 1; }
+}
+ @keyframes suction{
+  0%,100%{
+    box-shadow:
+      inset 0 0 60px rgba(160,80,255,.6),
+      0 0 80px rgba(160,80,255,.7);
+  }
+  50%{
+    box-shadow:
+      inset 0 0 120px rgba(200,100,255,1),
+      0 0 160px rgba(200,100,255,.9);
   }
 }
