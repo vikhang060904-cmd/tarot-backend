@@ -221,6 +221,7 @@
     const [phase, setPhase] = useState<"idle" | "shuffle" | "deal" | "done">("idle");
     const [time, setTime] = useState(0);
     const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+    const [hoverTime, setHoverTime] = useState(0);
     const boardRef = useRef<HTMLDivElement | null>(null);
     const [floatingCards, setFloatingCards] = useState(
   Array.from({ length: 6 }, (_, i) => ({
@@ -230,6 +231,14 @@
     speed: 0.002 + Math.random() * 0.002,
   }))
 );
+useEffect(() => {
+  if (hoveredIndex !== null) {
+    const t = setTimeout(() => setHoverTime(1), 400);
+    return () => clearTimeout(t);
+  } else {
+    setHoverTime(0);
+  }
+}, [hoveredIndex]);
     useEffect(() => {
     let raf: number;
 
@@ -880,7 +889,11 @@
       const cardKey = `${card.index ?? "x"}-${card.name}`;
 
       spawnBurst(event);
+      setScreenFlash(true);
+setBoardShock(true);
 
+    setTimeout(() => setScreenFlash(false), 250);
+    setTimeout(() => setBoardShock(false), 400);
       setFlyingCard({
         left: buttonRect.left - boardRect.left,
         top: buttonRect.top - boardRect.top,
@@ -1080,7 +1093,10 @@
         `,
         opacity
       }}
-    >
+    > 
+    
+
+
       <img src="/images/tarot/back.png" />
     </div>
   );
@@ -1136,63 +1152,68 @@
   </div>
                   
                       {visibleCards.slice(0, dealtCount).map((card, visibleIndex) => {
-                      const isSelected = selectedCards.some((c) => c.index === card.index);
+  const isSelected = selectedCards.some((c) => c.index === card.index);
 
-                    
-                    // 🔥 góc gốc
+  const total = visibleCards.length;
 
-                   const total = visibleCards.length;
+  // chia 2 vòng
+  const innerCount = Math.ceil(total * 0.28);
+  const outerCount = total - innerCount;
 
-// chia 2 vòng
-const innerCount = Math.ceil(total * 0.28);   // vòng trong
-const outerCount = total - innerCount;        // vòng ngoài
+  const isInner = visibleIndex < innerCount;
 
-const isInner = visibleIndex < innerCount;
+  // index từng vòng
+  const ringIndex = isInner ? visibleIndex : visibleIndex - innerCount;
+  const ringTotal = isInner ? innerCount : outerCount;
 
-// index từng vòng
-const ringIndex = isInner ? visibleIndex : visibleIndex - innerCount;
-const ringTotal = isInner ? innerCount : outerCount;
+  // góc
+  const angle = (ringIndex / ringTotal) * Math.PI * 2;
 
-// góc chia đều
-const angle = (ringIndex / ringTotal) * Math.PI * 2;
+  // hover
+  const isHovered = hoveredIndex === visibleIndex;
+  const hoverScale = isHovered ? 1.45 : 1;
+  const dimOthers = hoveredIndex !== null && !isHovered;
 
-// xoay động
-const orbit = angle + time * (isInner ? 0.18 : 0.11);
+  // bán kính
+  const radius = isInner ? 160 : 285;
 
-// bán kính
-const radius = isInner ? 160 : 285;
+  // orbit (xoay)
+  const orbit = angle + time * (isInner ? 0.18 : 0.11);
 
-// vị trí
-const x = Math.cos(orbit) * radius;
-const y = Math.sin(orbit) * radius * 0.82;
+  // depth
+  const depth = (Math.sin(orbit) + 1) / 2;
 
-// chiều sâu
-const depth = (Math.sin(orbit) + 1) / 2;
+  // freeze khi hover
+  const frozenOrbit = isHovered ? angle : orbit;
 
-// scale
-const scale = isInner
-  ? 0.78 + depth * 0.22
-  : 0.92 + depth * 0.18;
+  // position
+  const x = Math.cos(frozenOrbit) * radius;
+  const y = Math.sin(frozenOrbit) * radius * 0.82;
 
-// xoay lá bài
-const rotate = orbit * 180 / Math.PI + 90;
+  // magnet effect
+  const offsetX = isHovered ? Math.cos(frozenOrbit) * 20 : 0;
+  const offsetY = isHovered ? Math.sin(frozenOrbit) * 20 : 0;
 
-// layer
-const zIndex = isInner
-  ? 3000 + Math.floor(depth * 500)
-  : 1000 + Math.floor(depth * 500);
+  // scale
+  const scale = isInner
+    ? 0.78 + depth * 0.22
+    : 0.92 + depth * 0.18;
 
-// sáng
-const brightness = 0.8 + depth * 0.5;
+  // rotate
+  const rotate = orbit * 180 / Math.PI + 90;
 
-// blur
-const blur = (1 - depth) * 1.2;
+  // z-index
+  const zIndex = isInner
+    ? 3000 + Math.floor(depth * 500)
+    : 1000 + Math.floor(depth * 500);
 
-                      
-                      const dealDelay = visibleIndex * 25 + Math.random() * 120;
-                     
-                      const isHovered = hoveredIndex === visibleIndex;
-                      const hoverScale = isHovered ? 1.25 : 1;
+  // ánh sáng
+  const brightness = 0.8 + depth * 0.5;
+
+  // blur
+  const blur = (1 - depth) * 1.2;
+
+  const dealDelay = visibleIndex * 25 + Math.random() * 120;
 
                       return (
                         <button
@@ -1211,18 +1232,19 @@ const blur = (1 - depth) * 1.2;
         ["--r" as string]: `${rotate}deg`,
 transform: `
   translate(-50%, 50%)
-  translateX(${x}px)
-  translateY(${y}px)
-  translateZ(${scale * 200}px)
+  translateX(${x + offsetX}px)
+  translateY(${y + offsetY}px)
+  translateZ(${scale * 260}px)
   rotate(${rotate}deg)
   scale(${scale * hoverScale})
 `,
   zIndex: isHovered ? 9999 : zIndex + Math.floor(depth * 400),
-  opacity: 0.4 + depth * 0.6,
-  filter: `
-  brightness(${isHovered ? brightness * 1.6 : brightness})
-  blur(${blur}px)
-  drop-shadow(0 0 ${isHovered ? 80 : 15}px rgba(192,96,255,1))
+  opacity: dimOthers ? 0.15 : 0.4 + depth * 0.6,
+
+filter: `
+  brightness(${isHovered ? brightness * (hoverTime ? 2.2 : 1.6) : brightness})
+  blur(${dimOthers ? 3 : blur}px)
+  drop-shadow(0 0 ${isHovered ? 100 : 15}px rgba(192,96,255,1))
 `,
         ["--spiralX" as string]: `${x * 2.2}px`,
         ["--spiralY" as string]: `${y * 1.8}px`,
@@ -1317,7 +1339,19 @@ transform: `
         animation: "tp-ritual-ring 1.2s ease-out infinite",
       }}
     />
-
+    {isHovered && (
+  <div
+    className="mystic-beam"
+    style={{
+      left: "50%",
+      top: "55%",
+      transform: `
+        translate(-50%, -100%)
+        rotate(${rotate}deg)
+      `
+    }}
+  />
+)}
     <img
       src="/images/tarot/back.png"
       alt="Card Back"
@@ -1330,7 +1364,7 @@ transform: `
     />
   </button>
                       );
-                    })}
+                    })} 
 
                     {flyingCard && (
                       <div
