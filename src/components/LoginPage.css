@@ -1,126 +1,595 @@
-/* ==== BACKGROUND TAROT ==== */
+/* =======================================================
+   🌌 TAROT GAME LOGIN - CINEMATIC OCCULT VERSION
+======================================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&display=swap');
+
+/* ===== PAGE ===== */
+
 .login-container {
-  height: 100vh;
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  overflow: hidden; 
   display: flex;
   justify-content: center;
   align-items: center;
-
   background:
-    radial-gradient(circle at 20% 20%, rgba(168, 85, 247, 0.15), transparent 40%),
-    radial-gradient(circle at 80% 80%, rgba(236, 72, 153, 0.15), transparent 40%),
-    linear-gradient(135deg, #0b0b13, #140f2d, #1a1038);
-
-  animation: bgMove 10s infinite alternate;
+    radial-gradient(circle at top left,    rgba(91,33,182,.22),  transparent 28%),
+    radial-gradient(circle at bottom right, rgba(190,24,93,.16), transparent 32%),
+    linear-gradient(135deg, #020106 0%, #05010f 35%, #0b0218 65%, #14051f 100%);
 }
 
-/* ==== CARD ==== */
+/* ===== FILM GRAIN ===== */
+
+.login-container::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: .045;
+  background-image: radial-gradient(rgba(255,255,255,.15) 1px, transparent 1px);
+  background-size: 3px 3px;
+  mix-blend-mode: soft-light;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ===== STATIC STARS ===== */
+
+.login-container::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(2px 2px at 20% 30%, rgba(255,255,255,.9), transparent),
+    radial-gradient(1px 1px at 70% 40%, rgba(255,255,255,.7), transparent),
+    radial-gradient(2px 2px at 40% 70%, rgba(255,255,255,.7), transparent),
+    radial-gradient(1px 1px at 80% 80%, rgba(255,255,255,.6), transparent),
+    radial-gradient(2px 2px at 10% 90%, rgba(255,255,255,.5), transparent),
+    radial-gradient(1px 1px at 55% 15%, rgba(255,255,255,.65), transparent),
+    radial-gradient(2px 2px at 90% 25%, rgba(255,255,255,.55), transparent),
+    radial-gradient(1px 1px at 33% 55%, rgba(255,255,255,.6),  transparent);
+  background-size: 320px 320px;
+  opacity: .75;
+  background-blend-mode: screen;
+  animation: starsMove 90s linear infinite;
+  z-index: 0;
+}
+
+@keyframes starsMove {
+  from { transform: translateY(0); }
+  to   { transform: translateY(-320px); }
+}
+
+/* ===== DEEP SPACE / GALAXY LAYER ===== */
+
+.galaxy-layer {
+  position: absolute;
+  inset: -20%;
+  background:
+    radial-gradient(circle at 30% 40%, rgba(139,92,246,.18), transparent 25%),
+    radial-gradient(circle at 70% 65%, rgba(236,72,153,.14), transparent 30%),
+    radial-gradient(circle at 60% 20%, rgba(59,130,246,.10),  transparent 20%);
+  filter: blur(80px);
+  mix-blend-mode: screen;
+  animation: galaxyMove 18s ease-in-out infinite alternate;
+  pointer-events: none;
+  z-index: 1;
+}
+
+@keyframes galaxyMove {
+  0%   { transform: scale(1)    translate(0px,   0px); }
+  100% { transform: scale(1.15) translate(-40px,-30px); }
+}
+
+/* ===== SPACE VORTEX ===== */
+
+.space-vortex {
+  position: absolute;
+  width: 900px;
+  height: 900px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%,-50%);
+  border-radius: 50%;
+  background: conic-gradient(
+    from 0deg,
+    transparent,
+    rgba(139,92,246,.05),
+    transparent,
+    rgba(236,72,153,.05),
+    transparent
+  );
+  filter: blur(40px);
+  animation: vortexRotate 40s linear infinite;
+  opacity: .55;
+  pointer-events: none;
+  z-index: 1;
+}
+
+@keyframes vortexRotate {
+  from { transform: translate(-50%,-50%) rotate(0deg)   scale(1); }
+  to   { transform: translate(-50%,-50%) rotate(360deg) scale(1.08); }
+}
+
+/* ===== MAGIC ORBS ===== */
+
+.magic-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(100px);
+  opacity: .5;
+  pointer-events: none;
+  z-index: 1;
+  animation: orbFloat 10s ease-in-out infinite;
+}
+
+.orb1 { width: 280px; height: 280px; background: #7c3aed; top: 5%;    left: 5%;   animation-delay: 0s; }
+.orb2 { width: 360px; height: 360px; background: #db2777; bottom: -5%; right: 5%;  animation-delay: -4s; }
+.orb3 { width: 240px; height: 240px; background: #9333ea; top: 35%;   right: 18%; animation-delay: -7s; }
+
+@keyframes orbFloat {
+  0%,100% { transform: translateY(0px); }
+  50%      { transform: translateY(-25px); }
+}
+
+/* ===== RITUAL CIRCLE ===== */
+
+.ritual-circle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%,-50%);
+  width: 520px;
+  height: 520px;
+  border-radius: 50%;
+  border: 1px solid rgba(216,180,254,.22);
+  opacity: .32;
+  pointer-events: none;
+  z-index: 2;
+  animation: slowSpin 80s linear infinite;
+}
+
+.ritual-circle::before {
+  content: "";
+  position: absolute;
+  inset: 30px;
+  border-radius: 50%;
+  border: 1px dashed rgba(216,180,254,.14);
+  animation: slowSpin 50s linear infinite reverse;
+}
+
+.ritual-circle::after {
+  content: "";
+  position: absolute;
+  inset: 70px;
+  border-radius: 50%;
+  border: 1px solid rgba(216,180,254,.1);
+  animation: slowSpin 120s linear infinite;
+}
+
+@keyframes slowSpin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* ===== TAROT EYE ===== */
+
+.tarot-eye {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%,-50%);
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 2;
+  animation: eyePulse 4s ease-in-out infinite;
+}
+
+.tarot-eye::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid rgba(216,180,254,.18);
+}
+
+.tarot-eye::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.75);
+  transform: translate(-50%,-50%);
+  box-shadow: 0 0 18px rgba(255,255,255,.8), 0 0 40px rgba(192,132,252,.7);
+}
+
+@keyframes eyePulse {
+  0%,100% { transform: translate(-50%,-50%) scale(1);    opacity: .7; }
+  50%      { transform: translate(-50%,-50%) scale(1.08); opacity: 1;  }
+}
+
+/* ===== CARD ===== */
+
 .login-card {
-  width: 380px;
-  padding: 40px;
-  border-radius: 20px;
-
-  background: rgba(20, 15, 40, 0.7);
-  backdrop-filter: blur(20px);
-
-  border: 1px solid rgba(168, 85, 247, 0.2);
-
+  position: relative;
+  width: 460px;
+  padding: 52px 46px;
+  border-radius: 34px;
+  overflow: hidden;
+  backdrop-filter: blur(30px) saturate(180%);
+  -webkit-backdrop-filter: blur(30px) saturate(180%);
+  background: linear-gradient(145deg, rgba(10,5,20,.82), rgba(5,2,14,.94));
+  border: 1px solid rgba(255,255,255,.04);
   box-shadow:
-    0 0 40px rgba(168, 85, 247, 0.2),
-    inset 0 0 20px rgba(255, 255, 255, 0.05);
+    0 0 0 1px rgba(255,255,255,.03),
+    0 20px 80px rgba(0,0,0,.75),
+    0 0 120px rgba(124,58,237,.12);
+  z-index: 10;
+  animation: cardFloat 6s ease-in-out infinite;
+}
 
+@keyframes cardFloat {
+  0%,100% { transform: translateY(0px); }
+  50%      { transform: translateY(-10px); }
+}
+
+.login-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(255,255,255,.03), transparent 30%);
+  pointer-events: none;
+}
+
+.login-card::after {
+  content: "";
+  position: absolute;
+  inset: 12px;
+  border-radius: 22px;
+  border: 1px solid rgba(255,255,255,.05);
+  pointer-events: none;
+}
+
+/* ===== TAROT SYMBOL ===== */
+
+.tarot-symbol {
   text-align: center;
-
-  animation: fadeIn 0.8s ease;
+  margin-bottom: 18px;
+  font-size: 20px;
+  letter-spacing: 12px;
+  color: rgba(216,180,254,.85);
+  text-shadow: 0 0 18px rgba(192,132,252,.7), 0 0 40px rgba(124,58,237,.4);
+  animation: symbolGlow 4s ease-in-out infinite;
 }
 
-/* ==== ICON ==== */
-.login-icon {
-  font-size: 40px;
-  margin-bottom: 15px;
-  animation: glow 2s infinite alternate;
+@keyframes symbolGlow {
+  0%,100% { opacity: .7;  transform: translateY(0px); }
+  50%      { opacity: 1;   transform: translateY(-5px); }
 }
 
-/* ==== TITLE ==== */
+/* ===== TITLE ===== */
+
 .login-card h2 {
-  color: #fff;
-  margin-bottom: 20px;
+  text-align: center;
+  margin-bottom: 10px;
+  font-size: 54px;
+  line-height: .95;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-weight: 700;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: #f5e9ff;
+  text-shadow:
+    0 0 14px rgba(192,132,252,.4),
+    0 0 50px rgba(124,58,237,.22);
 }
 
-/* ==== INPUT ==== */
+/* ===== SUBTITLE ===== */
+
+.mystic-subtitle {
+  text-align: center;
+  margin-bottom: 28px;
+  color: rgba(255,255,255,.42);
+  font-size: 12px;
+  letter-spacing: 5px;
+  text-transform: uppercase;
+}
+
+/* ===== ERROR ===== */
+
+.error {
+  margin-bottom: 16px;
+  text-align: center;
+  color: #ff6b81;
+  font-size: 14px;
+}
+
+/* ===== INPUT ===== */
+
 .login-card input {
   width: 100%;
-  padding: 12px;
-  margin-bottom: 12px;
-
-  border-radius: 12px;
-  border: 1px solid rgba(168, 85, 247, 0.2);
-
-  background: rgba(255,255,255,0.05);
-  color: white;
-
+  padding: 17px 18px;
+  margin-bottom: 18px;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,.06);
+  background: rgba(255,255,255,.06);
+  color: #fff;
+  font-size: 15px;
   outline: none;
-  transition: 0.3s;
+  transition: border-color .35s, background .35s, box-shadow .35s;
 }
+
+.login-card input::placeholder { color: rgba(255,255,255,.42); }
 
 .login-card input:focus {
-  border-color: #a855f7;
-  box-shadow: 0 0 10px #a855f7;
+  border-color: rgba(192,132,252,.55);
+  background: rgba(255,255,255,.09);
+  box-shadow: 0 0 22px rgba(168,85,247,.28);
 }
 
-/* ==== BUTTON ==== */
+/* ===== BUTTON ===== */
+
 .login-card button {
   width: 100%;
-  padding: 12px;
-
-  border-radius: 12px;
+  padding: 17px;
   border: none;
-
-  background: linear-gradient(45deg, #7c3aed, #ec4899);
-
-  color: white;
-  font-weight: bold;
-
+  border-radius: 16px;
   cursor: pointer;
-
-  transition: 0.3s;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: #fff;
+  background: linear-gradient(135deg, #5b21b6, #7c3aed, #be185d);
+  box-shadow: 0 10px 30px rgba(124,58,237,.35);
+  transition: transform .35s, box-shadow .35s;
 }
 
 .login-card button:hover {
-  transform: translateY(-2px) scale(1.03);
-  box-shadow: 0 0 20px #a855f7;
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 16px 42px rgba(168,85,247,.5);
 }
 
-/* ==== ERROR ==== */
-.error {
-  color: #ff4d4f;
-  margin-bottom: 10px;
+.login-card button:active {
+  transform: scale(.98);
 }
 
-/* ==== SWITCH ==== */
+/* ===== DIVIDER ===== */
+
+.divider {
+  position: relative;
+  margin: 24px 0;
+  text-align: center;
+}
+
+.divider::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.1), transparent);
+}
+
+.divider span {
+  position: relative;
+  padding: 0 14px;
+  background: rgba(10,5,20,.95);
+  color: rgba(255,255,255,.4);
+  font-size: 12px;
+  letter-spacing: 3px;
+}
+
+/* ===== GOOGLE LOGIN ===== */
+
+.google-login {
+  margin-top: 18px;
+  display: flex;
+  justify-content: center;
+}
+
+/* ===== SWITCH ===== */
+
 .switch {
-  margin-top: 10px;
-  color: #aaa;
+  margin-top: 18px;
+  text-align: center;
+  color: #b9b3c9;
+  font-size: 14px;
 }
 
 .switch span {
-  color: #a855f7;
+  color: #d8b4fe;
   cursor: pointer;
-  font-weight: bold;
+  font-weight: 700;
 }
 
-/* ==== ANIMATION ==== */
+/* ===== PARTICLES ===== */
 
-@keyframes glow {
-  from { text-shadow: 0 0 5px #a855f7; }
-  to { text-shadow: 0 0 20px #ec4899; }
+.magic-particles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+.magic-particles span {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.7);
+  box-shadow: 0 0 12px rgba(255,255,255,.8);
+  animation: particleFloat linear infinite;
 }
 
-@keyframes bgMove {
-  from { background-position: 0% 0%; }
-  to { background-position: 100% 100%; }
+.magic-particles span:nth-child(1) { left: 10%; top: 90%; animation-duration: 12s; }
+.magic-particles span:nth-child(2) { left: 25%; top: 100%; animation-duration: 18s; animation-delay: -3s; }
+.magic-particles span:nth-child(3) { left: 40%; top: 95%; animation-duration: 15s; animation-delay: -7s; }
+.magic-particles span:nth-child(4) { left: 55%; top: 100%; animation-duration: 13s; animation-delay: -2s; }
+.magic-particles span:nth-child(5) { left: 70%; top: 92%; animation-duration: 17s; animation-delay: -9s; }
+.magic-particles span:nth-child(6) { left: 85%; top: 98%; animation-duration: 11s; animation-delay: -4s; }
+.magic-particles span:nth-child(7) { left: 60%; top: 100%; animation-duration: 20s; animation-delay: -6s; }
+.magic-particles span:nth-child(8) { left: 35%; top: 100%; animation-duration: 16s; animation-delay: -11s; }
+
+@keyframes particleFloat {
+  from { transform: translateY(0)      scale(1); opacity: 0; }
+  20%  {                                          opacity: 1; }
+  to   { transform: translateY(-110vh) scale(0); opacity: 0; }
+}
+
+/* ======================================================
+   ☄️  SHOOTING STARS — mượt, cong tự nhiên
+====================================================== */
+
+.shooting-stars {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 3;
+}
+
+/* --- BASE METEOR --- */
+.shooting-stars span {
+  position: absolute;
+  height: 2px;
+  border-radius: 999px;
+  opacity: 0;
+  will-change: transform, opacity;
+
+  background: linear-gradient(
+    90deg,
+    rgba(255,255,255,0)    0%,
+    rgba(192,132,252,.25) 30%,
+    rgba(192,132,252,.9)  75%,
+    rgba(255,255,255,1)  100%
+  );
+
+  box-shadow:
+    0 0 6px  rgba(255,255,255,.8),
+    0 0 20px rgba(192,132,252,.85),
+    0 0 45px rgba(168,85,247,.6);
+
+  filter: blur(0.8px);
+}
+
+/* --- HEAD GLOW --- */
+.shooting-stars span::before {
+  content: "";
+  position: absolute;
+  right: -6px;
+  top: 50%;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  transform: translateY(-50%);
+  background: #fff;
+  box-shadow:
+    0 0 8px  #fff,
+    0 0 24px rgba(255,255,255,.9),
+    0 0 50px rgba(192,132,252,.9);
+}
+
+/* --- STAR 1 --- */
+.shooting-stars span:nth-child(1) {
+  top: 10%;
+  left: -25%;
+  width: 320px;
+  animation: meteorFly1 7s linear infinite;
+  animation-delay: 0s;
+}
+
+/* --- STAR 2 --- */
+.shooting-stars span:nth-child(2) {
+  top: 26%;
+  left: -30%;
+  width: 420px;
+  animation: meteorFly2 10s linear infinite;
+  animation-delay: -3s;
+}
+
+/* --- STAR 3 --- */
+.shooting-stars span:nth-child(3) {
+  top: 5%;
+  left: -18%;
+  width: 260px;
+  animation: meteorFly3 8s linear infinite;
+  animation-delay: -5.5s;
+}
+
+/* --- STAR 4 --- */
+.shooting-stars span:nth-child(4) {
+  top: 38%;
+  left: -22%;
+  width: 360px;
+  animation: meteorFly4 12s linear infinite;
+  animation-delay: -1.5s;
+}
+
+/* -------------------------------------------------------
+   Mỗi meteor có offset cong riêng để tạo cảm giác khác nhau
+   translate3d: X tăng mạnh (bay ngang), Y tăng nhẹ (nghiêng)
+   scaleX tăng dần → đuôi kéo dài ra khi bay
+------------------------------------------------------- */
+
+@keyframes meteorFly1 {
+  0%   { transform: translate3d(-5vw,  0vh, 0) rotate(-24deg) scaleX(.3); opacity: 0; }
+  6%   { opacity: 1; }
+  18%  { transform: translate3d(35vw, 14vh, 0) rotate(-23deg) scaleX(1); }
+  42%  { transform: translate3d(88vw, 38vh, 0) rotate(-21deg) scaleX(1.15); opacity: 1; }
+  100% { transform: translate3d(170vw,78vh, 0) rotate(-18deg) scaleX(.7); opacity: 0; }
+}
+
+@keyframes meteorFly2 {
+  0%   { transform: translate3d(-5vw,  0vh, 0) rotate(-26deg) scaleX(.25); opacity: 0; }
+  5%   { opacity: 1; }
+  20%  { transform: translate3d(40vw, 16vh, 0) rotate(-25deg) scaleX(1); }
+  45%  { transform: translate3d(95vw, 42vh, 0) rotate(-23deg) scaleX(1.2); opacity: 1; }
+  100% { transform: translate3d(180vw,86vh, 0) rotate(-19deg) scaleX(.65); opacity: 0; }
+}
+
+@keyframes meteorFly3 {
+  0%   { transform: translate3d(-5vw,  0vh, 0) rotate(-22deg) scaleX(.35); opacity: 0; }
+  7%   { opacity: 1; }
+  22%  { transform: translate3d(38vw, 12vh, 0) rotate(-21deg) scaleX(.95); }
+  44%  { transform: translate3d(86vw, 34vh, 0) rotate(-20deg) scaleX(1.1); opacity: 1; }
+  100% { transform: translate3d(165vw,72vh, 0) rotate(-17deg) scaleX(.6); opacity: 0; }
+}
+
+@keyframes meteorFly4 {
+  0%   { transform: translate3d(-5vw,  0vh, 0) rotate(-28deg) scaleX(.2); opacity: 0; }
+  6%   { opacity: 1; }
+  16%  { transform: translate3d(30vw, 18vh, 0) rotate(-27deg) scaleX(1); }
+  40%  { transform: translate3d(82vw, 50vh, 0) rotate(-24deg) scaleX(1.25); opacity: 1; }
+  100% { transform: translate3d(175vw,96vh, 0) rotate(-20deg) scaleX(.7); opacity: 0; }
+}
+
+/* ===== MOBILE ===== */
+
+@media (max-width: 768px) {
+
+  .login-card {
+    width: 92%;
+    padding: 32px 24px;
+  }
+
+  .login-card h2 { font-size: 38px; }
+
+  .ritual-circle {
+    width: 340px;
+    height: 340px;
+  }
+
+  .tarot-eye { display: none; }
+
+  .space-vortex {
+    width: 500px;
+    height: 500px;
+  }
 }
