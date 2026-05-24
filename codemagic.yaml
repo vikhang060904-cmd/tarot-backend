@@ -1,0 +1,28 @@
+workflows:
+  ios-simulator-workflow:
+    name: Tarot Talk iOS Simulator Build
+    max_build_duration: 60
+    instance_type: mac_mini_m1
+    environment:
+      groups:
+        - none
+      flutter: stable
+      xcode: latest
+      cocoapods: default
+    triggering:
+      events:
+        - push
+      branch_patterns:
+        - pattern: main
+          include: true
+    working_directory: app_web_view_NEW
+    scripts:
+      - name: Set up Flutter packages
+        script: |
+          flutter precache --ios
+          flutter packages pub get
+      - name: Build iOS Simulator App
+        script: |
+          flutter build ios --simulator --no-codesign
+    artifacts:
+      - build/ios/iphonesimulator/*.app
