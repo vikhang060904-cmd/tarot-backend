@@ -6,10 +6,10 @@
 class AppConfig {
   // ── BASE URLs ──────────────────────────────────────────────
   /// URL backend FastAPI (không có dấu / ở cuối)
-  static const String apiBaseUrl = 'https://idiocy-hurled-antler.ngrok-free.dev';
+  static const String apiBaseUrl = 'https://uncover-projector-dastardly.ngrok-free.dev';
 
   /// URL frontend web (không có dấu / ở cuối)
-  static const String webBaseUrl = 'https://idiocy-hurled-antler.ngrok-free.dev';
+  static const String webBaseUrl = 'https://uncover-projector-dastardly.ngrok-free.dev';
 
   // ── OAUTH DEEP LINK ────────────────────────────────────────
   /// Scheme cho Deep Link callback sau Google OAuth

@@ -1,11 +1,11 @@
 import { useState, useEffect, useRef } from "react";
-import { GoogleLogin } from "@react-oauth/google";
+import { useLang } from "../i18n/LanguageContext";
 
 interface LoginPageProps {
   onLogin: (email: string) => void;
 }
 
-const API = "http://127.0.0.1:8002";
+const API = "";
 
 /* ================================================================
    METEOR CANVAS — sao băng bay cong mượt theo Bezier
@@ -297,7 +297,10 @@ this.alpha = 0;
         this.sparks.forEach(s => {
           ctx.globalAlpha = this.alpha * s.life * 0.7;
           ctx.fillStyle = `rgba(${r},${g},${b},1)`;
-          ctx.beginPath(); ctx.arc(s.x, s.y, s.r * s.life, 0, Math.PI * 2); ctx.fill();
+          ctx.beginPath();
+          const radius = Math.max(0, s.r * s.life);
+          ctx.arc(s.x, s.y, radius, 0, Math.PI * 2);
+          ctx.fill();
         });
         ctx.restore();
       }
@@ -407,6 +410,7 @@ meteors.forEach((m) => {
   return (
     <canvas
       ref={canvasRef}
+      className="cosmic-canvas"
       style={{ position: "absolute", inset: 0, zIndex: 2, pointerEvents: "none" }}
     />
   );
@@ -416,18 +420,20 @@ meteors.forEach((m) => {
    LOGIN PAGE
 ================================================================ */
 export default function LoginPage({ onLogin }: LoginPageProps) {
+  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth < 768;
   const [isSignup, setIsSignup] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [passwordConfirm, setPasswordConfirm] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const { t, lang } = useLang();
 
   /* ---- LOGIN ---- */
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-    if (!email || !password) { setError("⚠️ Vui lòng nhập đầy đủ"); return; }
+    if (!email || !password) { setError(lang === 'vi' ? "⚠️ Vui lòng nhập đầy đủ" : "⚠️ Please fill in all fields"); return; }
     try {
       setLoading(true);
       const res = await fetch(`${API}/api/login`, {
@@ -437,13 +443,13 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
       });
       const text = await res.text();
       let data: any;
-      try { data = JSON.parse(text); } catch { throw new Error("Server trả về không phải JSON"); }
-      if (!res.ok) throw new Error(data?.detail || "❌ Sai tài khoản hoặc mật khẩu");
+      try { data = JSON.parse(text); } catch { throw new Error(lang === 'vi' ? "Server trả về không phải JSON" : "Server returned invalid data"); }
+      if (!res.ok) throw new Error(data?.detail || (lang === 'vi' ? "❌ Sai tài khoản hoặc mật khẩu" : "❌ Wrong email or password"));
       localStorage.setItem("email", data.email);
       localStorage.setItem("role", data.role);
       onLogin(data.email);
     } catch (err: any) {
-      setError(err.message || "❌ Lỗi hệ thống");
+      setError(err.message || t.common.error);
     } finally { setLoading(false); }
   };
 
@@ -451,9 +457,9 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-    if (!email || !password || !passwordConfirm) { setError("⚠️ Nhập đầy đủ thông tin"); return; }
-    if (password !== passwordConfirm) { setError("❌ Mật khẩu không khớp"); return; }
-    if (password.length < 6) { setError("❌ Mật khẩu phải >= 6 ký tự"); return; }
+    if (!email || !password || !passwordConfirm) { setError(lang === 'vi' ? "⚠️ Nhập đầy đủ thông tin" : "⚠️ Please fill in all fields"); return; }
+    if (password !== passwordConfirm) { setError(lang === 'vi' ? "❌ Mật khẩu không khớp" : "❌ Passwords don't match"); return; }
+    if (password.length < 6) { setError(lang === 'vi' ? "❌ Mật khẩu phải >= 6 ký tự" : "❌ Password must be at least 6 characters"); return; }
     try {
       setLoading(true);
       const res = await fetch(`${API}/api/signup`, {
@@ -463,50 +469,122 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data?.detail || "Signup failed");
-      alert("🎉 Tạo tài khoản thành công!");
+      alert(lang === 'vi' ? "🎉 Tạo tài khoản thành công!" : "🎉 Account created successfully!");
       setIsSignup(false);
       setPassword("");
       setPasswordConfirm("");
     } catch (err: any) {
-      setError(err.message || "❌ Không tạo được tài khoản");
+      setError(err.message || (lang === 'vi' ? "❌ Không tạo được tài khoản" : "❌ Could not create account"));
     } finally { setLoading(false); }
   };
 
-  /* ---- GOOGLE LOGIN ---- */
-  const handleGoogleLogin = async (credentialResponse: any) => {
-    try {
-      setLoading(true);
-      setError("");
-      const res = await fetch(`${API}/api/google-login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token: credentialResponse.credential }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.detail || "Google Login Failed");
-      localStorage.setItem("email", data.email);
-      localStorage.setItem("role", data.role);
-      onLogin(data.email);
-    } catch (err: any) {
-      setError(err.message || "Google Login Error");
-    } finally { setLoading(false); }
+  /* ---- GOOGLE LOGIN via Redirect (mobile-friendly) ---- */
+  const GOOGLE_CLIENT_ID = "26506370221-ucrnjduq50naerlghgukbqtp1vatee9j.apps.googleusercontent.com";
+  const isFlutterApp = typeof (window as any).FlutterBridge !== "undefined";
+
+  // URL dùng cho browser thường (không phải APK)
+  const googleOAuthUrl = "https://accounts.google.com/o/oauth2/v2/auth?" + new URLSearchParams({
+    client_id: GOOGLE_CLIENT_ID,
+    redirect_uri: window.location.origin,
+    response_type: "token",
+    scope: "email profile",
+    prompt: "select_account",
+  }).toString();
+
+  // Xử lý callback khi Google redirect về với access_token trong URL hash (browser flow)
+  useEffect(() => {
+    const hash = window.location.hash;
+    if (!hash.includes("access_token")) return;
+
+    const hashParams = new URLSearchParams(hash.replace("#", ""));
+    const accessToken = hashParams.get("access_token");
+    if (!accessToken) return;
+
+    window.history.replaceState(null, "", window.location.pathname + window.location.search);
+    setLoading(true);
+    setError("");
+
+    fetch("https://www.googleapis.com/oauth2/v3/userinfo", {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    })
+      .then(r => r.json())
+      .then(async userInfo => {
+        if (!userInfo.email) throw new Error("Không lấy được email từ Google");
+        const res = await fetch(`${API}/api/google-login`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: userInfo.email, name: userInfo.name || "" }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.detail || "Google Login Failed");
+        localStorage.setItem("email", data.email);
+        localStorage.setItem("role", data.role);
+        onLogin(data.email);
+      })
+      .catch(err => setError(err.message || "Google Login Error"))
+      .finally(() => setLoading(false));
+  }, []);
+
+  // Flutter APK flow: gửi bridge message, polling backend
+  const handleFlutterGoogleLogin = () => {
+    const sessionId = Math.random().toString(36).slice(2);
+    setLoading(true);
+    setError("");
+
+    // Yêu cầu Flutter mở Chrome Custom Tab
+    (window as any).FlutterBridge.postMessage(`GOOGLE_LOGIN:${sessionId}`);
+
+    // Polling backend mỗi 2s để chờ kết quả
+    let attempts = 0;
+    const maxAttempts = 60; // 2 phút
+    const poll = setInterval(async () => {
+      attempts++;
+      if (attempts > maxAttempts) {
+        clearInterval(poll);
+        setLoading(false);
+        setError("❌ Đăng nhập Google hết thời gian. Vui lòng thử lại.");
+        return;
+      }
+      try {
+        const res = await fetch(`${API}/api/google-session/${sessionId}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.email) {
+            clearInterval(poll);
+            localStorage.setItem("email", data.email);
+            localStorage.setItem("role", data.role || "user");
+            onLogin(data.email);
+          }
+        }
+      } catch { /* bỏ qua lỗi polling */ }
+    }, 2000);
   };
+
+
 
   return (
     <div style={styles.container}>
 
-      {/* ===== MAGIC ORBS ===== */}
-      <div style={{ ...styles.orb, ...styles.orb1 }} />
-      <div style={{ ...styles.orb, ...styles.orb2 }} />
-      <div style={{ ...styles.orb, ...styles.orb3 }} />
+      {/* ===== MAGIC ORBS (Hidden on mobile for performance) ===== */}
+      {!isMobile && (
+        <>
+          <div style={{ ...styles.orb, ...styles.orb1 }} />
+          <div style={{ ...styles.orb, ...styles.orb2 }} />
+          <div style={{ ...styles.orb, ...styles.orb3 }} />
+        </>
+      )}
 
       {/* ===== METEOR CANVAS ===== */}
-      <GalaxyBackground />
-<CosmicDust />
-<MeteorCanvas />
+      {!isMobile && (
+        <>
+          <GalaxyBackground />
+          <CosmicDust />
+          <MeteorCanvas />
+        </>
+      )}
 
       {/* ===== RITUAL RING (CSS) ===== */}
-      <div style={styles.ritualRing} />
+      {!isMobile && <div style={styles.ritualRing} />}
 
       {/* ===== LOGIN CARD ===== */}
       <div style={styles.card}>
@@ -519,11 +597,11 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
 
         {/* Title */}
         <h2 style={styles.title}>
-          {isSignup ? "Đăng ký" : "Đăng nhập"}
+          {isSignup ? t.login.submitRegister : t.login.submitLogin}
         </h2>
 
         {/* Subtitle */}
-        <p style={styles.subtitle}>Khám phá vận mệnh của bạn</p>
+        <p style={styles.subtitle}>{t.login.subtitle}</p>
 
         {/* Error */}
         {error && <p style={styles.error}>{error}</p>}
@@ -532,7 +610,7 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
         <form onSubmit={isSignup ? handleSignup : handleLogin} style={styles.form}>
           <input
             type="email"
-            placeholder="📧 Email"
+            placeholder={`📧 ${t.login.emailLabel}`}
             value={email}
             onChange={e => setEmail(e.target.value)}
             style={styles.input}
@@ -541,7 +619,7 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
           />
           <input
             type="password"
-            placeholder="🔑 Mật khẩu"
+            placeholder={`🔑 ${t.login.passwordLabel}`}
             value={password}
             onChange={e => setPassword(e.target.value)}
             style={styles.input}
@@ -551,7 +629,7 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
           {isSignup && (
             <input
               type="password"
-              placeholder="🔁 Nhập lại mật khẩu"
+              placeholder={`🔁 ${lang === 'vi' ? 'Nhập lại mật khẩu' : 'Confirm password'}`}
               value={passwordConfirm}
               onChange={e => setPasswordConfirm(e.target.value)}
               style={styles.input}
@@ -566,33 +644,65 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
             onMouseEnter={e => Object.assign(e.currentTarget.style, styles.buttonHover)}
             onMouseLeave={e => Object.assign(e.currentTarget.style, styles.button)}
           >
-            {loading ? "⏳ Đang xử lý..." : isSignup ? "Bắt đầu hành trình" : "Tiến vào Tarot"}
+            {loading ? t.login.loading : isSignup ? (lang === 'vi' ? "Bắt đầu hành trình" : "Start journey") : (lang === 'vi' ? "Tiến vào Tarot" : "Enter Tarot")}
           </button>
         </form>
 
         {/* Divider */}
         <div style={styles.divider}>
           <div style={styles.dividerLine} />
-          <span style={styles.dividerText}>hoặc</span>
+          <span style={styles.dividerText}>{lang === 'vi' ? 'hoặc' : 'or'}</span>
           <div style={styles.dividerLine} />
         </div>
 
         {/* Google */}
         <div style={styles.googleWrap}>
-          <GoogleLogin
-            onSuccess={handleGoogleLogin}
-            onError={() => setError("❌ Google Login Failed")}
-          />
+          {isFlutterApp ? (
+            // APK: dùng FlutterBridge để mở Chrome Custom Tab
+            <button
+              type="button"
+              onClick={handleFlutterGoogleLogin}
+              disabled={loading}
+              style={{ ...styles.googleBtn, border: "none", cursor: "pointer" }}
+            >
+              <svg width="20" height="20" viewBox="0 0 48 48" style={{ flexShrink: 0 }}>
+                <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+                <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+                <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+                <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+              </svg>
+              <span>{lang === 'vi' ? (loading ? '⏳ Đang chờ...' : 'Đăng nhập bằng Google') : (loading ? '⏳ Waiting...' : 'Sign in with Google')}</span>
+            </button>
+          ) : (
+            // Browser: dùng thẻ <a> href trực tiếp
+            <a
+              href={googleOAuthUrl}
+              style={{
+                ...styles.googleBtn,
+                textDecoration: "none",
+                pointerEvents: loading ? "none" : "auto",
+                opacity: loading ? 0.6 : 1,
+              }}
+            >
+              <svg width="20" height="20" viewBox="0 0 48 48" style={{ flexShrink: 0 }}>
+                <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+                <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+                <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+                <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+              </svg>
+              <span>{lang === 'vi' ? 'Đăng nhập bằng Google' : 'Sign in with Google'}</span>
+            </a>
+          )}
         </div>
 
         {/* Switch */}
         <p style={styles.switchText}>
-          {isSignup ? "Đã có tài khoản? " : "Chưa có tài khoản? "}
+          {isSignup ? (lang === 'vi' ? 'Đã có tài khoản? ' : 'Already have an account? ') : (lang === 'vi' ? 'Chưa có tài khoản? ' : 'No account? ')}
           <span
             style={styles.switchLink}
             onClick={() => setIsSignup(!isSignup)}
           >
-            {isSignup ? "Đăng nhập" : "Đăng ký"}
+            {isSignup ? t.login.submitLogin : t.login.submitRegister}
           </span>
         </p>
       </div>
@@ -789,6 +899,44 @@ const styles: Record<string, React.CSSProperties> = {
   },
 
   googleWrap: { display: "flex", justifyContent: "center" },
+
+  googleBtn: {
+    display: "flex",
+    alignItems: "center",
+    gap: 10,
+    padding: "13px 24px",
+    border: "1px solid rgba(255,255,255,.12)",
+    borderRadius: 16,
+    background: "rgba(255,255,255,.07)",
+    color: "#f0e6ff",
+    fontSize: 15,
+    fontWeight: 600,
+    cursor: "pointer",
+    transition: "all .25s",
+    width: "100%",
+    justifyContent: "center",
+    backdropFilter: "blur(8px)",
+    WebkitBackdropFilter: "blur(8px)",
+  },
+  googleBtnHover: {
+    display: "flex",
+    alignItems: "center",
+    gap: 10,
+    padding: "13px 24px",
+    border: "1px solid rgba(192,132,252,.45)",
+    borderRadius: 16,
+    background: "rgba(255,255,255,.13)",
+    color: "#f0e6ff",
+    fontSize: 15,
+    fontWeight: 600,
+    cursor: "pointer",
+    transition: "all .25s",
+    width: "100%",
+    justifyContent: "center",
+    backdropFilter: "blur(8px)",
+    WebkitBackdropFilter: "blur(8px)",
+    boxShadow: "0 0 18px rgba(192,132,252,.2)",
+  },
 
   switchText: {
     marginTop: 18,
