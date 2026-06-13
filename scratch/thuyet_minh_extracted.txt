@@ -1,0 +1,29 @@
+Thuyết minh chức năng web TMĐT
+
+Vì nhiều SV giấu nội dung kỹ quá thầy tìm ko ra có thể bị mất điểm nên SV viết 1 bảng thuyết minh (hình nằm ở đâu or link) để nếu thầy tìm ko ra chức năng đó thì vào file thuyết minh xem có ko. Và NHỚ LIVE DÙM
+
+Video của em mong thầy duyệt ạ web em bị sập em làm bởi locohot xambb nặng quá tải lên nfinityFree không nổi ạ
+
+Chức năng
+
+Hình hoặc link vị trí trên web
+
+Web bán hàng có woo
+
+Chuyên mục, sản phẩm
+
+Menu
+
+Trang chủ, liên hệ
+
+Biến thể
+
+Đếm lượt truy cập (dưới chân trang)
+
+Quảng cáo (banner or pop-up) nằm ở trang chủ
+
+Đặt hàng: địa chỉ, banking
+
+Lọc sản phẩm nằm ở trang SHOP
+
+Đếm ngược event nằm ở trang chủ

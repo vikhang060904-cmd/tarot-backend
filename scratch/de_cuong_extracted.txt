@@ -1,0 +1,125 @@
+ĐỀ CƯƠNG NGHIÊN CỨU
+
+Họvàtên:NguyễnVĩKhangMSSV:226626Tên đề tài: Hệ thống du lịch trực tuyến SmartTravel
+
+1. Hoàn cảnh xuất phát đề tài
+
+1.1. Tình huống thực tế xuất phát đề tài
+
+Trong bối cảnh công nghệ thông tin và Internet phát triển mạnh mẽ, nhu cầu du lịch của người dân ngày càng gia tăng cả về số lượng lẫn chất lượng. Tuy nhiên, trên thực tế, người dùng vẫn gặp nhiều khó khăn trong việc tìm kiếm thông tin du lịch đáng tin cậy, so sánh chi phí, lên lịch trình phù hợp và đặt các dịch vụ liên quan như vé, khách sạn hay tour du lịch. Phần lớn các hoạt động này hiện nay vẫn mang tính rời rạc, thiếu tính cá nhân hóa và chưa được tích hợp trong một hệ thống thống nhất.
+
+Xuất phát từ nhu cầu thực tiễn đó, việc xây dựng một hệ thống du lịch trực tuyến thông minh – SmartTravel – nhằm hỗ trợ người dùng tra cứu thông tin, lập kế hoạch và quản lý chuyến đi một cách thuận tiện là hết sức cần thiết.
+
+1.2. Tình hình nghiên cứu trong nước và trên thế giới
+
+Trên thế giới, nhiều hệ thống và nền tảng du lịch trực tuyến đã được nghiên cứu và phát triển như các hệ thống đặt vé, đặt phòng, gợi ý điểm đến dựa trên dữ liệu người dùng. Các nghiên cứu tập trung vào việc ứng dụng công nghệ web, cơ sở dữ liệu lớn và trí tuệ nhân tạo để nâng cao trải nghiệm người dùng.
+
+Tại Việt Nam, các website và ứng dụng du lịch trực tuyến đã xuất hiện nhưng phần lớn mới chỉ dừng lại ở việc cung cấp thông tin hoặc đặt dịch vụ đơn lẻ. Các nghiên cứu học thuật về hệ thống du lịch thông minh vẫn còn hạn chế, đặc biệt là các hệ thống tích hợp nhiều chức năng như quản lý hành trình, gợi ý địa điểm và hỗ trợ người dùng theo thời gian thực.
+
+1.3. Dự kiến các ứng dụng trong tương lai
+
+Hệ thống SmartTravel có tiềm năng ứng dụng rộng rãi trong thực tế, không chỉ phục vụ khách du lịch cá nhân mà còn hỗ trợ các doanh nghiệp lữ hành, khách sạn và cơ quan quản lý du lịch. Trong tương lai, hệ thống có thể mở rộng tích hợp công nghệ trí tuệ nhân tạo để cá nhân hóa hành trình, phân tích hành vi người dùng và dự đoán xu hướng du lịch.
+
+2. Sản phẩm nghiệm thu
+
+Sản phẩm nghiệm thu của đề tài là một hệ thống du lịch trực tuyến SmartTravel, bao gồm:
+
+Website hoặc ứng dụng cho phép người dùng tra cứu thông tin du lịch.
+
+Chức năng lập kế hoạch và quản lý chuyến đi.
+
+Hệ thống quản lý dữ liệu điểm đến, dịch vụ du lịch.
+
+Báo cáo mô tả thiết kế, chức năng và kết quả thực hiện hệ thống.
+
+3. Tóm tắt nội dung và phương pháp thực hiện
+
+3.1. Nghiên cứu lý thuyết cơ sở
+
+Nghiên cứu các kiến thức nền tảng về:
+
+Hệ thống thông tin.
+
+Công nghệ web và kiến trúc phần mềm.
+
+Cơ sở dữ liệu.
+
+Các mô hình hệ thống du lịch trực tuyến.
+
+3.2. Cấu hình phần cứng 
+
+Hệ thống được triển khai trên máy tính cá nhân với cấu hình cơ bản, đủ đáp ứng cho việc phát triển và chạy thử nghiệm phần mềm, không yêu cầu phần cứng chuyên dụng.
+
+3.3. Thiết kế thuật toán
+
+Thiết kế các thuật toán phục vụ:
+
+Xử lý yêu cầu người dùng.
+
+Tìm kiếm và lọc thông tin du lịch.
+
+Quản lý lịch trình và dữ liệu chuyến đi.
+
+3.4. Xây dựng cơ sở dữ liệu
+
+Thiết kế và xây dựng cơ sở dữ liệu lưu trữ:
+
+Thông tin người dùng.
+
+Thông tin địa điểm du lịch.
+
+Dữ liệu dịch vụ và lịch trình.
+
+3.5. Xây dựng phần mềm
+
+Tiến hành xây dựng hệ thống SmartTravel dựa trên các công nghệ web hiện đại, đảm bảo giao diện thân thiện, dễ sử dụng và khả năng mở rộng trong tương lai.
+
+3.6. Sản phẩm dự kiến và khả năng ứng dụng
+
+Sản phẩm hoàn chỉnh có thể áp dụng thử nghiệm trong môi trường thực tế, hỗ trợ người dùng lập kế hoạch du lịch hiệu quả, đồng thời làm nền tảng cho các nghiên cứu và phát triển tiếp theo trong lĩnh vực du lịch thông minh.
+
+4. Tài liệu tham khảo
+
+[1] Laudon, K. C., & Laudon, J. P. (2020). Management Information Systems: Managing the Digital Firm. Pearson Education.
+
+[2] Sommerville, I. (2016). Software Engineering (10th ed.). Pearson Education.
+
+[3] Buhalis, D. (2003). eTourism: Information Technology for Strategic Tourism Management. Pearson Education.
+
+[4] Buhalis, D., & Amaranggana, A. (2015). Smart tourism destinations: Foundations, measurements, and applications. Information and Communication Technologies in Tourism. Springer.
+
+[5] Xiang, Z., Magnini, V. P., & Fesenmaier, D. R. (2015). Information technology and consumer behavior in travel and tourism. Journal of Travel Research, 54(2), 244–259.
+
+[6] Gretzel, U., Sigala, M., Xiang, Z., & Koo, C. (2015). Smart tourism: Foundations and developments. Electronic Markets, 25(3), 179–188.
+
+[7] UNWTO. (2019). Smart destinations and tourism innovation. World Tourism Organization. https://www.unwto.org
+
+[8] UNWTO. (2021). Tourism and digital transformation. World Tourism Organization. https://www.unwto.org
+
+[9] OECD. (2020). Tourism trends and policies. OECD Publishing. https://www.oecd.org/tourism
+
+[10] W3C. (2023). Web application architecture and standards. World Wide Web Consortium. https://www.w3.org
+
+[11] Pressman, R. S., & Maxim, B. R. (2019). Software Engineering: A Practitioner’s Approach. McGraw-Hill Education.
+
+[12] Oracle. (2022). Database systems concepts. Oracle Corporation. https://www.oracle.com/database
+
+[13] MySQL. (2023). MySQL documentation. Oracle Corporation. https://dev.mysql.com/doc/
+
+[14] MongoDB. (2023). MongoDB manual. MongoDB Inc. https://www.mongodb.com/docs/
+
+[15] Fowler, M. (2018). Patterns of Enterprise Application Architecture. Addison-Wesley.
+
+[16] Fielding, R. T. (2000). Architectural styles and the design of network-based software architectures. Doctoral dissertation, University of California, Irvine.
+
+[17] Ricci, F., Rokach, L., & Shapira, B. (2015). Recommender Systems Handbook. Springer.
+
+[18] Aggarwal, C. C. (2016). Recommender Systems: The Textbook. Springer.
+
+[19] Google Developers. (2023). Maps Platform documentation. https://developers.google.com/maps
+
+[20] OpenTravel Alliance. (2022). Open standards for travel and tourism. https://opentravel.org
+
+[21] Bộ Văn hóa, Thể thao và Du lịch. (2020). Chuyển đổi số trong ngành du lịch Việt Nam. Nhà xuất bản Văn hóa – Thông tin.
+
+[22] Tổng cục Du lịch Việt Nam. (2021). Báo cáo phát triển du lịch thông minh. https://vietnamtourism.gov.vn

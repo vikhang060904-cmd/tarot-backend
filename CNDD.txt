@@ -1,0 +1,187 @@
+FRONTEND (Giao diện)
+1. React
+useState
+component
+tsx
+props
+const [email, setEmail] = useState("");
+2. TypeScript
+đang dùng .tsx
+interface LoginPageProps
+=> React + TypeScript.
+3. Vite
+Trong terminal có:
+vite.config.ts
+=>build bằng Vite.
+4. CSS Animation nâng cao
+File CSS của bạn đang dùng:
+keyframes
+transform 3D
+blur
+glow
+perspective
+conic-gradient
+radial-gradient
+Đây là phần tạo:
+hiệu ứng bài tarot
+phát sáng
+hover
+cinematic
+crystal ball
+floating card
+	BACKEND
+5. FastAPI
+đang dùng FastAPI vì có API:
+http://127.0.0.1:8002/api/login
+8. GitHub
+Bạn đang dùng:
+git push
+repository
+=> lưu source code.
+	AI APIs
+9. OpenRouter
+Trong terminal có:
+OpenRouter API Key
+
+=> bạn đang dùng OpenRouter AI API.
+	HIỆU ỨNG 3D / GAME STYLE
+CSS của bạn đang đi theo hướng:
+cinematic UI
+magical UI
+game UI
+3D hover
+particle vibe
+Giống phong cách:
+game card opening
+Marvel Snap
+Hearthstone
+Tarot fantasy UI
+	TỔNG HỢP STACK
+Frontend
+React
+TypeScript
+Vite
+CSS Animation nâng cao
+Backend
+Python
+FastAPI
+Hosting
+Firebase Hosting
+Source Control
+Git
+GitHub
+AI
+OpenRouter API
+
+	THƯ VIỆN & CÔNG NGHỆ KHÁC
+10. Node.js
+
+đang chạy:
+
+npm
+vite
+firebase
+
+=> cần Node.js.
+
+11. NPM
+
+Dùng để cài:
+
+react
+vite
+firebase-tools
+packages
+	API / NETWORK
+12. REST API
+
+Bạn đang dùng kiểu:
+
+fetch("/api/login")
+
+=> đây là REST API communication.
+
+13. JSON
+
+Bạn đang truyền dữ liệu:
+
+JSON.stringify()
+res.json()
+
+=> JSON data exchange.
+
+	UI/UX EFFECTS
+14. CSS 3D Transform
+
+đang dùng:
+
+transform-style: preserve-3d;
+perspective: 1200px;
+rotateX
+scale
+translateY
+
+=> đây là CSS 3D Engine style.
+
+15. Particle / Cinematic Animation System
+
+
+@keyframes tp-cinematic-deal
+@keyframes floatCard
+@keyframes swirl
+
+	AUTH / LOGIN
+16. Authentication System
+
+đã làm:
+
+signup
+login
+role
+localStorage
+
+
+localStorage.setItem("role", data.role);
+
+=> hệ thống xác thực người dùng.
+
+	CLOUD / HOSTING
+17. Static Hosting Architecture
+
+Bạn đang dùng:
+
+frontend deploy cloud
+backend local/server riêng
+
+=> mô hình:
+
+Frontend (Firebase)
+↓
+Backend API (FastAPI)
+	  FULL STACK CỦA BẠN
+Frontend
+React
+TypeScript
+Vite
+CSS3 Animation
+3D Transform
+SPA Architecture
+Backend
+Python
+FastAPI
+REST API
+AI
+OpenRouter API
+Deploy
+Firebase Hosting
+Tools
+Git
+GitHub
+npm
+Node.js
+Effects
+Cinematic animation
+Glow VFX
+Hover physics
+Floating animation
+Aura system

@@ -1,0 +1,175 @@
+Nguyễn Vĩ Khang 226626 DH22TIN07
+
+2. Data Science (Khoa học dữ liệu) là gì?
+
+2.1 Khái niệm Khoa học dữ liệu
+
+Khoa học dữ liệu (Data Science) là một lĩnh vực liên ngành kết hợp nhiều lĩnh vực như toán học, thống kê, khoa học máy tính, trí tuệ nhân tạo và phân tích dữ liệu nhằm thu thập, xử lý và phân tích dữ liệu để rút ra thông tin có giá trị phục vụ cho việc ra quyết định.
+
+Trong thời đại công nghệ số, dữ liệu được tạo ra với số lượng rất lớn từ nhiều nguồn khác nhau như mạng xã hội, hệ thống giao dịch, cảm biến, website, thiết bị di động,…. Tuy nhiên, dữ liệu thô thường không mang lại nhiều giá trị nếu không được xử lý và phân tích. Khoa học dữ liệu giúp biến dữ liệu thô thành thông tin có ý nghĩa và tri thức hữu ích.
+
+Một hệ thống khoa học dữ liệu thường sử dụng nhiều kỹ thuật như:
+
+Thu thập dữ liệu (Data Collection)
+
+Xử lý và làm sạch dữ liệu (Data Cleaning)
+
+Phân tích dữ liệu (Data Analysis)
+
+Trực quan hóa dữ liệu (Data Visualization)
+
+Xây dựng mô hình dự đoán bằng Machine Learning hoặc AI
+
+Thông qua các kỹ thuật này, các nhà khoa học dữ liệu có thể tìm ra mối quan hệ, xu hướng và quy luật trong dữ liệu, từ đó giúp doanh nghiệp hoặc tổ chức đưa ra các quyết định chính xác hơn.
+
+2.2 Các ứng dụng của Khoa học dữ liệu
+
+Khoa học dữ liệu được ứng dụng rộng rãi trong nhiều lĩnh vực khác nhau của đời sống và kinh tế.
+
+1. Thương mại điện tử
+
+Trong lĩnh vực thương mại điện tử, Data Science được sử dụng để:
+
+Phân tích hành vi mua hàng của khách hàng
+
+Gợi ý sản phẩm phù hợp
+
+Dự đoán nhu cầu thị trường
+
+Tối ưu hóa chiến lược marketing
+
+2. Tài chính – Ngân hàng
+
+Trong ngành tài chính, khoa học dữ liệu giúp:
+
+Phát hiện giao dịch bất thường hoặc gian lận
+
+Đánh giá rủi ro tín dụng của khách hàng
+
+Dự đoán xu hướng thị trường chứng khoán
+
+Tối ưu hóa chiến lược đầu tư
+
+Các ngân hàng sử dụng mô hình Machine Learning để phân tích lịch sử giao dịch và phát hiện những hoạt động đáng ngờ.
+
+3. Y tế
+
+Trong lĩnh vực y tế, Data Science được sử dụng để:
+
+Phân tích hồ sơ bệnh án
+
+Dự đoán bệnh tật
+
+Hỗ trợ chẩn đoán y khoa
+
+Phát triển thuốc mới
+
+4. Marketing
+
+Trong marketing, Data Science giúp doanh nghiệp:
+
+Phân tích hành vi khách hàng
+
+Phân nhóm khách hàng
+
+Cá nhân hóa quảng cáo
+
+Tối ưu hóa chiến dịch marketing
+
+5. Giao thông và logistics
+
+Khoa học dữ liệu cũng được sử dụng trong:
+
+Dự đoán tình trạng giao thông
+
+Tối ưu hóa tuyến đường vận chuyển
+
+Quản lý hệ thống giao thông thông minh
+
+2.3 Quy trình của ngành Khoa học dữ liệu
+
+Quy trình của khoa học dữ liệu thường bao gồm nhiều bước nhằm đảm bảo dữ liệu được xử lý và phân tích một cách hiệu quả.
+
+1. Thu thập dữ liệu (Data Collection)
+
+Đây là bước đầu tiên của quá trình Data Science.Dữ liệu có thể được thu thập từ nhiều nguồn khác nhau như:
+
+Database của doanh nghiệp
+
+Website và mạng xã hội
+
+API
+
+Cảm biến IoT
+
+File dữ liệu như CSV hoặc Excel
+
+Chất lượng dữ liệu thu thập sẽ ảnh hưởng trực tiếp đến kết quả phân tích sau này.
+
+2. Làm sạch dữ liệu (Data Cleaning)
+
+Dữ liệu thực tế thường chứa nhiều vấn đề như:
+
+Dữ liệu thiếu
+
+Dữ liệu trùng lặp
+
+Dữ liệu sai định dạng
+
+Trong bước này, các nhà khoa học dữ liệu sẽ loại bỏ hoặc chỉnh sửa những dữ liệu không chính xác, đảm bảo dữ liệu có chất lượng tốt trước khi phân tích.
+
+3. Phân tích dữ liệu (Data Analysis)
+
+Sau khi dữ liệu đã được làm sạch, các nhà khoa học dữ liệu sẽ tiến hành phân tích để tìm ra:
+
+Xu hướng trong dữ liệu
+
+Mối quan hệ giữa các biến
+
+Các mẫu dữ liệu quan trọng
+
+Các kỹ thuật thống kê và công cụ phân tích dữ liệu như Python, R hoặc SQL thường được sử dụng trong bước này.
+
+4. Xây dựng mô hình (Model Building)
+
+Ở bước này, các thuật toán Machine Learning hoặc AI sẽ được sử dụng để xây dựng mô hình dự đoán.
+
+Một số thuật toán phổ biến gồm:
+
+Linear Regression
+
+Decision Tree
+
+Random Forest
+
+Neural Network
+
+Mục tiêu của bước này là xây dựng mô hình có khả năng dự đoán hoặc phân loại dữ liệu mới.
+
+5. Đánh giá mô hình (Model Evaluation)
+
+Sau khi mô hình được xây dựng, cần phải đánh giá hiệu quả của mô hình bằng các chỉ số như:
+
+Accuracy
+
+Precision
+
+Recall
+
+F1-score
+
+Việc đánh giá giúp đảm bảo rằng mô hình hoạt động chính xác và đáng tin cậy.
+
+6. Triển khai mô hình (Deployment)
+
+Bước cuối cùng là đưa mô hình vào sử dụng trong hệ thống thực tế.
+
+Ví dụ:
+
+Hệ thống gợi ý sản phẩm trên website
+
+Hệ thống dự đoán nhu cầu khách hàng
+
+Hệ thống phát hiện gian lận
+
+Sau khi triển khai, mô hình cần được theo dõi và cập nhật thường xuyên để đảm bảo hiệu suất tốt.

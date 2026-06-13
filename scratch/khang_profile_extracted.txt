@@ -1,0 +1,459 @@
+Nguyễn Vĩ Khang 226626 DH22TIN07
+
+Phần 1
+
+Phân hoạch lớp tương đương
+
+Lớp hợp lệ
+
+E1: 0–16 → Không thuê 
+
+E2: 17–18 → Thuê bán thời gian 
+
+E3: 19–50 → Thuê toàn thời gian 
+
+E4: 51–90 → Không thuê 
+
+Lớp không hợp lệ / chưa xác định
+
+E5: Nhỏ hơn 0 
+
+E6: 21–50 
+
+E7: Lớn hơn 90 
+
+E8: Không phải số / để trống
+
+Theo kỹ thuật giá trị biên, thường kiểm tra:
+
+ngay dưới biên 
+
+tại biên 
+
+ngay trên biên
+
+Các trường hợp kiểm thử
+
+test case theo phân hoạch lớp tương đương:
+
+TC
+
+Dữ liệu vào (Tuổi)
+
+Lớp kiểm thử
+
+Kết quả mong đợi
+
+TC01
+
+10
+
+0–16
+
+Không thuê
+
+TC02
+
+17
+
+17–18
+
+Thuê bán thời gian
+
+TC03
+
+19
+
+19–50
+
+Thuê toàn thời gian
+
+TC04
+
+60
+
+51–90
+
+Không thuê
+
+TC05
+
+-1
+
+< 0
+
+Báo lỗi / Không hợp lệ
+
+TC06
+
+30
+
+21–50
+
+Chưa xác định theo đặc tả
+
+TC07
+
+91
+
+> 90
+
+Báo lỗi / Không hợp lệ
+
+TC08
+
+rỗng
+
+Không nhập dữ liệu
+
+Báo lỗi / Không hợp lệ
+
+TC09
+
+abc
+
+Ký tự không phải số
+
+Báo lỗi / Không hợp lệ
+
+test case theo giá trị biên
+
+Biên dưới
+
+TC
+
+Dữ liệu vào
+
+Kết quả mong đợi
+
+TC10
+
+-1
+
+Báo lỗi / Không hợp lệ
+
+TC11
+
+0
+
+Không thuê
+
+TC12
+
+1
+
+Không thuê
+
+Biên 16–18
+
+TC
+
+Dữ liệu vào
+
+Kết quả mong đợi
+
+TC13
+
+16
+
+Không thuê
+
+TC14
+
+17
+
+Thuê bán thời gian
+
+TC15
+
+18
+
+Thuê bán thời gian
+
+Biên 19–21
+
+TC
+
+Dữ liệu vào
+
+Kết quả mong đợi
+
+TC16
+
+19
+
+Chưa xác định theo đặc tả
+
+TC17
+
+20
+
+Thuê toàn thời gian
+
+TC18
+
+21
+
+Chưa xác định theo đặc tả
+
+Biên 49-51
+
+Biên trên
+
+TC
+
+Dữ liệu vào
+
+Kết quả mong đợi
+
+TC19
+
+49
+
+Chưa xác định theo đặc tả
+
+TC20
+
+50
+
+Chưa xác định theo đặc tả
+
+51
+
+Không thuê
+
+Biên  89 - 91
+
+TC
+
+Dữ liệu vào
+
+Kết quả mong đợi
+
+TC21
+
+89
+
+Không thuê
+
+TC21
+
+90
+
+Không thuê
+
+TC22
+
+91
+
+Báo lỗi / Không hợp lệ
+
+Buổi 2
+
+Phân hoạch lớp tương đương:
+
+[0 – 3.9] → Học khóa sau 
+
+[4.0 – 5.9] → Lên lớp xếp TB 
+
+[6.0 – 7.9] → Lên lớp xếp Khá 
+
+[8.0 – 10.0] → Lên lớp giỏi 
+
+(<0) → Không hợp lệ 
+
+(>10.0) → Không hợp lệ 
+
+Rỗng → Không hợp lệ 
+
+Ký tự/chữ → Không hợp lệ
+
+Test case theo phân hoạch lớp tương đương
+
+TC
+
+Điểm TB nhập vào
+
+Lớp tương đương
+
+Kết quả mong đợi
+
+TC01
+
+2.5
+
+0 – 3.9
+
+Học khóa sau
+
+TC02
+
+5.0
+
+4.0 – 5.9
+
+Lên lớp xếp TB
+
+TC03
+
+7.0
+
+6.0 – 7.9
+
+Lên lớp xếp Khá
+
+TC04
+
+9.0
+
+8.0 – 10.0
+
+Lên lớp giỏi
+
+TC05
+
+-1
+
+< 0
+
+Không hợp lệ
+
+TC06
+
+10.5
+
+> 10.0
+
+Không hợp lệ
+
+TC07
+
+rỗng
+
+Không nhập dữ liệu
+
+Không hợp lệ
+
+TC08
+
+abc
+
+Ký tự / chữ
+
+Không hợp lệ
+
+Test case theo phân tích giá trị biên
+
+TC
+
+Điểm TB nhập vào
+
+Kết quả mong đợi
+
+TC09
+
+-0.1
+
+Không hợp lệ
+
+TC10
+
+0.0
+
+Học khóa sau
+
+TC11
+
+0.1
+
+Học khóa sau
+
+TC12
+
+3.8
+
+Học khóa sau
+
+TC13
+
+3.9
+
+Học khóa sau
+
+TC14
+
+4.0
+
+Lên lớp xếp TB
+
+TC15
+
+4.1
+
+Lên lớp xếp TB
+
+TC16
+
+5.8
+
+Lên lớp xếp TB
+
+TC17
+
+5.9
+
+Lên lớp xếp TB
+
+TC18
+
+6.0
+
+Lên lớp xếp Khá
+
+TC19
+
+6.1
+
+Lên lớp xếp Khá
+
+TC20
+
+7.8
+
+Lên lớp xếp Khá
+
+TC21
+
+7.9
+
+Lên lớp xếp Khá
+
+TC22
+
+8.0
+
+Lên lớp giỏi
+
+TC23
+
+8.1
+
+Lên lớp giỏi
+
+TC24
+
+9.9
+
+Lên lớp giỏi
+
+TC25
+
+10.0
+
+Lên lớp giỏi
+
+TC26
+
+10.1
+
+Không hợp lệ

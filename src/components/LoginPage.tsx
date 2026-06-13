@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { GoogleLogin } from "@react-oauth/google";
 import { useLang } from "../i18n/LanguageContext";
 
 interface LoginPageProps {
@@ -420,6 +421,7 @@ meteors.forEach((m) => {
    LOGIN PAGE
 ================================================================ */
 export default function LoginPage({ onLogin }: LoginPageProps) {
+  const isMobileApp = /TarotTalkApp/i.test(navigator.userAgent) || document.cookie.indexOf("viewappmobie=true") !== -1;
   const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth < 768;
   const [isSignup, setIsSignup] = useState(false);
   const [email, setEmail] = useState("");
@@ -480,18 +482,8 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
 
   /* ---- GOOGLE LOGIN via Redirect (mobile-friendly) ---- */
   const GOOGLE_CLIENT_ID = "26506370221-ucrnjduq50naerlghgukbqtp1vatee9j.apps.googleusercontent.com";
-  const isFlutterApp = typeof (window as any).FlutterBridge !== "undefined";
 
-  // URL dùng cho browser thường (không phải APK)
-  const googleOAuthUrl = "https://accounts.google.com/o/oauth2/v2/auth?" + new URLSearchParams({
-    client_id: GOOGLE_CLIENT_ID,
-    redirect_uri: window.location.origin,
-    response_type: "token",
-    scope: "email profile",
-    prompt: "select_account",
-  }).toString();
-
-  // Xử lý callback khi Google redirect về với access_token trong URL hash (browser flow)
+  // Xử lý callback khi Google redirect về với access_token trong URL hash
   useEffect(() => {
     const hash = window.location.hash;
     if (!hash.includes("access_token")) return;
@@ -500,7 +492,9 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
     const accessToken = hashParams.get("access_token");
     if (!accessToken) return;
 
+    // Xóa hash khỏi URL ngay
     window.history.replaceState(null, "", window.location.pathname + window.location.search);
+
     setLoading(true);
     setError("");
 
@@ -525,42 +519,24 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
       .finally(() => setLoading(false));
   }, []);
 
-  // Flutter APK flow: gửi bridge message, polling backend
-  const handleFlutterGoogleLogin = () => {
-    const sessionId = Math.random().toString(36).slice(2);
-    setLoading(true);
-    setError("");
+  const handleGoogleRedirect = () => {
+    // Nếu là WebView của App Flutter, gọi bridge thay vì redirect
+    if (isMobileApp && window.FlutterBridge) {
+      window.FlutterBridge.postMessage('GOOGLE_LOGIN:' + Date.now().toString());
+      return;
+    }
 
-    // Yêu cầu Flutter mở Chrome Custom Tab
-    (window as any).FlutterBridge.postMessage(`GOOGLE_LOGIN:${sessionId}`);
-
-    // Polling backend mỗi 2s để chờ kết quả
-    let attempts = 0;
-    const maxAttempts = 60; // 2 phút
-    const poll = setInterval(async () => {
-      attempts++;
-      if (attempts > maxAttempts) {
-        clearInterval(poll);
-        setLoading(false);
-        setError("❌ Đăng nhập Google hết thời gian. Vui lòng thử lại.");
-        return;
-      }
-      try {
-        const res = await fetch(`${API}/api/google-session/${sessionId}`);
-        if (res.ok) {
-          const data = await res.json();
-          if (data.email) {
-            clearInterval(poll);
-            localStorage.setItem("email", data.email);
-            localStorage.setItem("role", data.role || "user");
-            onLogin(data.email);
-          }
-        }
-      } catch { /* bỏ qua lỗi polling */ }
-    }, 2000);
+    // Dùng window.location.origin sẽ lấy đúng URL đang chạy, dù bạn đổi ngrok.
+    const redirectUri = window.location.origin;
+    const params = new URLSearchParams({
+      client_id: GOOGLE_CLIENT_ID,
+      redirect_uri: redirectUri,
+      response_type: "token",
+      scope: "email profile",
+      prompt: "select_account",
+    });
+    window.location.href = `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;
   };
-
-
 
   return (
     <div style={styles.container}>
@@ -649,34 +625,22 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
         </form>
 
         {/* Divider */}
-        <div style={styles.divider}>
-          <div style={styles.dividerLine} />
-          <span style={styles.dividerText}>{lang === 'vi' ? 'hoặc' : 'or'}</span>
-          <div style={styles.dividerLine} />
-        </div>
+        {!isMobileApp && (
+          <div style={styles.divider}>
+            <div style={styles.dividerLine} />
+            <span style={styles.dividerText}>{lang === 'vi' ? 'hoặc' : 'or'}</span>
+            <div style={styles.dividerLine} />
+          </div>
+        )}
 
         {/* Google */}
         <div style={styles.googleWrap}>
-          {isFlutterApp ? (
-            // APK: dùng FlutterBridge để mở Chrome Custom Tab
-            <button
-              type="button"
-              onClick={handleFlutterGoogleLogin}
-              disabled={loading}
-              style={{ ...styles.googleBtn, border: "none", cursor: "pointer" }}
-            >
-              <svg width="20" height="20" viewBox="0 0 48 48" style={{ flexShrink: 0 }}>
-                <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
-                <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
-                <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
-                <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
-              </svg>
-              <span>{lang === 'vi' ? (loading ? '⏳ Đang chờ...' : 'Đăng nhập bằng Google') : (loading ? '⏳ Waiting...' : 'Sign in with Google')}</span>
-            </button>
-          ) : (
-            // Browser: dùng thẻ <a> href trực tiếp
             <a
-              href={googleOAuthUrl}
+              href="#"
+              onClick={(e) => {
+                e.preventDefault();
+                handleGoogleRedirect();
+              }}
               style={{
                 ...styles.googleBtn,
                 textDecoration: "none",
@@ -692,8 +656,7 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
               </svg>
               <span>{lang === 'vi' ? 'Đăng nhập bằng Google' : 'Sign in with Google'}</span>
             </a>
-          )}
-        </div>
+          </div>
 
         {/* Switch */}
         <p style={styles.switchText}>
@@ -899,43 +862,27 @@ const styles: Record<string, React.CSSProperties> = {
   },
 
   googleWrap: { display: "flex", justifyContent: "center" },
-
   googleBtn: {
     display: "flex",
     alignItems: "center",
     gap: 10,
     padding: "13px 24px",
-    border: "1px solid rgba(255,255,255,.12)",
+    border: "1px solid rgba(255, 255, 255, 0.12)",
     borderRadius: 16,
-    background: "rgba(255,255,255,.07)",
+    background: "rgba(255, 255, 255, 0.07)",
     color: "#f0e6ff",
     fontSize: 15,
     fontWeight: 600,
     cursor: "pointer",
-    transition: "all .25s",
+    transition: "0.25s",
     width: "100%",
     justifyContent: "center",
     backdropFilter: "blur(8px)",
-    WebkitBackdropFilter: "blur(8px)",
   },
   googleBtnHover: {
-    display: "flex",
-    alignItems: "center",
-    gap: 10,
-    padding: "13px 24px",
-    border: "1px solid rgba(192,132,252,.45)",
-    borderRadius: 16,
-    background: "rgba(255,255,255,.13)",
-    color: "#f0e6ff",
-    fontSize: 15,
-    fontWeight: 600,
-    cursor: "pointer",
-    transition: "all .25s",
-    width: "100%",
-    justifyContent: "center",
-    backdropFilter: "blur(8px)",
-    WebkitBackdropFilter: "blur(8px)",
-    boxShadow: "0 0 18px rgba(192,132,252,.2)",
+    background: "rgba(255, 255, 255, 0.12)",
+    transform: "translateY(-2px)",
+    boxShadow: "0 8px 24px rgba(0, 0, 0, 0.2)",
   },
 
   switchText: {

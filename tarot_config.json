@@ -1,0 +1,6 @@
+{
+    "reading_cost": 5,
+    "follow_up_cost": 2,
+    "temperature": 0.35,
+    "max_tokens": 1800
+}

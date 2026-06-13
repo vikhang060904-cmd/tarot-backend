@@ -1,6 +1,6 @@
 import { Table, Button, Space, Popconfirm, message } from "antd";
 
-const API = "http://127.0.0.1:8002";
+const API = "";
 
 export default function UsersTable({ data, reload }: any) {
 

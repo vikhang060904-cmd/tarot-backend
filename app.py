@@ -5,7 +5,7 @@ if hasattr(sys.stdout, 'reconfigure'):
 from pydoc import text
 from google.oauth2 import id_token
 from google.auth.transport import requests as grequests
-from fastapi import FastAPI, Request, Header, HTTPException, Depends, Response
+from fastapi import FastAPI, Request, Header, HTTPException, Depends
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -2518,156 +2518,67 @@ def admin_save_tarot_config(data: dict):
             
     return {"success": True, "message": "Đã lưu cấu hình Tarot nâng cao!"}
 
-
-# =====================================================
-# GOOGLE OAUTH SESSION STORE (in-memory, TTL ~5 min)
-# =====================================================
-import time as _time
-_google_sessions: dict = {}  # session_id -> {email, role, ts}
-
-def _cleanup_sessions():
-    now = _time.time()
-    expired = [k for k, v in _google_sessions.items() if now - v.get("ts", 0) > 300]
-    for k in expired:
-        del _google_sessions[k]
-
-@app.get("/auth/google/login/flutter")
-async def google_login_flutter(session_id: str, request: Request):
-    """Mở trang Google OAuth cho Flutter Chrome Custom Tab"""
-    GOOGLE_CLIENT_ID = "26506370221-ucrnjduq50naerlghgukbqtp1vatee9j.apps.googleusercontent.com"
-    
-    # Xây dựng redirect_uri trỏ về callback endpoint của backend
-    base = str(request.base_url).rstrip("/")
-    callback_uri = f"{base}/auth/google/callback/flutter"
-    
-    params = {
-        "client_id": GOOGLE_CLIENT_ID,
-        "redirect_uri": callback_uri,
-        "response_type": "token",
-        "scope": "email profile",
-        "prompt": "select_account",
-        "state": session_id,
-    }
-    from urllib.parse import urlencode
-    google_url = "https://accounts.google.com/o/oauth2/v2/auth?" + urlencode(params)
-    from fastapi.responses import RedirectResponse
-    return RedirectResponse(url=google_url)
-
-@app.get("/auth/google/callback/flutter")
-async def google_callback_flutter(request: Request):
-    """Nhận callback từ Google OAuth, trả về trang HTML tự xử lý token từ hash"""
-    html = """<!DOCTYPE html>
-<html>
-<head><meta charset="utf-8"><title>Đăng nhập...</title></head>
-<body>
-<p style="font-family:sans-serif;text-align:center;padding:40px">Đang xử lý đăng nhập...</p>
-<script>
-const hash = window.location.hash.substring(1);
-const params = new URLSearchParams(hash);
-const token = params.get('access_token');
-const state = params.get('state') || new URLSearchParams(window.location.search).get('state');
-if (token && state) {
-  fetch('/auth/google/session/save', {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({access_token: token, session_id: state})
-  }).then(() => { document.body.innerHTML = '<p style="font-family:sans-serif;text-align:center;padding:40px">✅ Đăng nhập thành công! Bạn có thể đóng tab này.</p>'; });
-} else {
-  document.body.innerHTML = '<p style="font-family:sans-serif;text-align:center;padding:40px;color:red">❌ Lỗi đăng nhập. Vui lòng thử lại.</p>';
-}
-</script>
-</body></html>"""
-    from fastapi.responses import HTMLResponse
-    return HTMLResponse(content=html)
-
-@app.post("/auth/google/session/save")
-async def save_google_session(data: dict):
-    """Lưu kết quả Google OAuth vào session store"""
-    access_token = data.get("access_token", "")
-    session_id = data.get("session_id", "")
-    if not access_token or not session_id:
-        raise HTTPException(status_code=400, detail="Missing fields")
-    
-    # Gọi Google userinfo để lấy email
-    import httpx
-    userinfo_res = httpx.get("https://www.googleapis.com/oauth2/v3/userinfo",
-        headers={"Authorization": f"Bearer {access_token}"})
-    if userinfo_res.status_code != 200:
-        raise HTTPException(status_code=401, detail="Invalid access token")
-    
-    userinfo = userinfo_res.json()
-    email = userinfo.get("email", "").strip().lower()
-    if not email:
-        raise HTTPException(status_code=400, detail="No email in token")
-    
-    # Tạo/tìm user trong DB
-    conn = get_conn()
-    cur = conn.cursor(dictionary=True)
-    cur.execute("SELECT * FROM users WHERE email=%s", (email,))
-    user = cur.fetchone()
-    if not user:
-        cur.execute("INSERT INTO users (email, password, role, token_balance) VALUES (%s, '', 'user', 15)", (email,))
-        conn.commit()
-        cur.execute("SELECT * FROM users WHERE email=%s", (email,))
-        user = cur.fetchone()
-    conn.close()
-    
-    _cleanup_sessions()
-    _google_sessions[session_id] = {"email": user["email"], "role": user["role"], "ts": _time.time()}
-    return {"success": True}
-
-@app.get("/api/google-session/{session_id}")
-async def get_google_session(session_id: str):
-    """Polling endpoint: web kiểm tra session đã có kết quả chưa"""
-    _cleanup_sessions()
-    session = _google_sessions.get(session_id)
-    if not session:
-        return Response(status_code=204)  # No content yet
-    # Xóa session sau khi đọc
-    del _google_sessions[session_id]
-    return {"email": session["email"], "role": session["role"]}
-
 @app.post("/api/google-login")
-
 async def google_login(data: dict):
 
-    GOOGLE_CLIENT_ID = "26506370221-ucrnjduq50naerlghgukbqtp1vatee9j.apps.googleusercontent.com"
+    token = data.get("token")
 
-    # Flow mới: frontend đã gọi Google userinfo và gửi email trực tiếp
-    email = data.get("email", "").strip().lower()
-    name = data.get("name", "Google User")
-
-    # Flow cũ (fallback): verify ID token
-    if not email:
-        token = data.get("token")
-        if not token:
-            raise HTTPException(status_code=400, detail="Missing email or token")
-        try:
-            info = id_token.verify_oauth2_token(token, grequests.Request(), GOOGLE_CLIENT_ID)
-            email = info.get("email", "").strip().lower()
-            name = info.get("name", "Google User")
-        except Exception as e:
-            raise HTTPException(status_code=401, detail=f"Token invalid: {e}")
-
-    if not email:
-        raise HTTPException(status_code=400, detail="Email not found")
+    if not token:
+        raise HTTPException(status_code=400, detail="Missing token")
 
     try:
+        GOOGLE_CLIENT_ID = "26506370221-ucrnjduq50naerlghgukbqtp1vatee9j.apps.googleusercontent.com"
+        # VERIFY TOKEN GOOGLE
+        info = id_token.verify_oauth2_token(
+            token,
+            grequests.Request(),
+            
+        )
+
+        email = info.get("email", "").strip().lower()
+        name = info.get("name", "Google User")
+
+        if not email:
+            raise HTTPException(status_code=400, detail="Email not found")
+
         conn = get_conn()
         cur = conn.cursor(dictionary=True)
 
         # CHECK USER
-        cur.execute("SELECT * FROM users WHERE email=%s", (email,))
+        cur.execute(
+            "SELECT * FROM users WHERE email=%s",
+            (email,)
+        )
+
         user = cur.fetchone()
 
         # CHƯA CÓ -> TẠO
         if not user:
+
             cur.execute("""
-                INSERT INTO users (email, password, role, token_balance)
-                VALUES (%s, '', 'user', 15)
+                INSERT INTO users
+                (
+                    email,
+                    password,
+                    role,
+                    token_balance
+                )
+                VALUES
+                (
+                    %s,
+                    '',
+                    'user',
+                    15
+                )
             """, (email,))
+
             conn.commit()
-            cur.execute("SELECT * FROM users WHERE email=%s", (email,))
+
+            cur.execute(
+                "SELECT * FROM users WHERE email=%s",
+                (email,)
+            )
+
             user = cur.fetchone()
 
         conn.close()

@@ -189,19 +189,16 @@ class _WebViewScreenState extends State<WebViewScreen> {
     debugPrint('==> 🚀 [CCT] Mở Tab login cho Session: $sessionId - Lần: $_cctOpenCount');
 
     try {
-      // Mở Chrome Custom Tab đến backend, backend redirect sang Google
       final loginUrl = '${AppConfig.apiBaseUrl}/auth/google/login/flutter?session_id=$sessionId';
       
+      // Mở CCT. Ở luồng mới này, App chỉ cần mở Tab. 
+      // Người dùng login xong Server cập nhật DB, Web sẽ tự Polling thấy Token.
       await FlutterWebAuth2.authenticate(
         url: loginUrl,
-        callbackUrlScheme: AppConfig.callbackScheme,
-      ).catchError((e) {
-        // Bình thường khi user đóng tab sau khi đăng nhập xong
-        debugPrint('==> CCT closed: $e');
-        return '';
-      });
+        callbackUrlScheme: 'none', // Không dùng callback scheme nữa
+      );
     } catch (e) {
-      debugPrint('==> CCT error: $e');
+      debugPrint('==> CCT closed/cancelled');
     } finally {
       _isAuthenticating = false;
     }

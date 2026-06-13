@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useLang } from "../i18n/LanguageContext";
 
 type HistoryCard = {
   name: string;
@@ -37,19 +38,11 @@ type ProfileSummaryResponse = {
 interface ProfilePageProps {
   userEmail: string;
   currentTokens: number;
+  onLogout?: () => void;
 }
 
-const API_BASE = "http://127.0.0.1:8002";
+const API_BASE = "";
 const READING_COST = 5;
-
-const topicLabelMap: Record<string, string> = {
-  general: "Chung",
-  love: "Tình Yêu",
-  family: "Gia Đình",
-  career: "Sự Nghiệp",
-  health: "Sức Khỏe",
-  money: "Tài Chính",
-};
 
 const topicIconMap: Record<string, string> = {
   general: "🔮",
@@ -60,27 +53,8 @@ const topicIconMap: Record<string, string> = {
   money: "💰",
 };
 
-const packageBadgeMap: Record<string, string> = {
-  starter: "✨ Khởi Đầu",
-  explorer: "⚡ Khám Phá",
-  master: "👑 Thạo Thủ",
-};
-
-const formatDateTime = (value: string) => {
-  if (!value) return "—";
-  const d = new Date(value.replace(" ", "T"));
-  if (Number.isNaN(d.getTime())) return value;
-  return d.toLocaleString("vi-VN");
-};
-
-const formatDateOnly = (value: string) => {
-  if (!value) return "—";
-  const d = new Date(value.replace(" ", "T"));
-  if (Number.isNaN(d.getTime())) return value;
-  return d.toLocaleDateString("vi-VN");
-};
-
-const ProfilePage = ({ userEmail, currentTokens }: ProfilePageProps) => {
+const ProfilePage = ({ userEmail, currentTokens, onLogout }: ProfilePageProps) => {
+  const { lang } = useLang();
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -89,9 +63,87 @@ const ProfilePage = ({ userEmail, currentTokens }: ProfilePageProps) => {
   const [summaryLoading, setSummaryLoading] = useState(true);
   const [currentPackage, setCurrentPackage] = useState<CurrentPackage>(null);
 
+  const topicLabelMap: Record<string, string> = lang === 'vi'
+    ? { general: "Chung", love: "Tình Yêu", family: "Gia Đình", career: "Sự Nghiệp", health: "Sức Khỏe", money: "Tài Chính" }
+    : { general: "General", love: "Love", family: "Family", career: "Career", health: "Health", money: "Finance" };
+
+  const packageBadgeMap: Record<string, string> = lang === 'vi'
+    ? { starter: "✨ Khởi Đầu", explorer: "⚡ Khám Phá", master: "👑 Thạo Thủ" }
+    : { starter: "✨ Starter", explorer: "⚡ Explorer", master: "👑 Master" };
+
+  const translateQuestion = (q: string) => {
+    if (lang !== 'en' || !q) return q;
+    const match = q.match(/^Tổng quan về (.+) trong thời gian tới$/i);
+    if (match) {
+      const topic = match[1].trim().toLowerCase();
+      let topicEn = "general";
+      if (topic === "chung") topicEn = "general";
+      else if (topic === "tình yêu") topicEn = "love";
+      else if (topic === "gia đình") topicEn = "family";
+      else if (topic === "sự nghiệp") topicEn = "career";
+      else if (topic === "sức khỏe") topicEn = "health";
+      else if (topic === "tài chính") topicEn = "finance";
+      else topicEn = topic;
+      const capitalized = topicEn.charAt(0).toUpperCase() + topicEn.slice(1);
+      return `${capitalized} overview in the near future`;
+    }
+    return q;
+  };
+
+  const formatDateTime = (value: string) => {
+    if (!value) return "—";
+    const d = new Date(value.replace(" ", "T"));
+    if (Number.isNaN(d.getTime())) return value;
+    return d.toLocaleString(lang === 'vi' ? "vi-VN" : "en-US");
+  };
+
+  const formatDateOnly = (value: string) => {
+    if (!value) return "—";
+    const d = new Date(value.replace(" ", "T"));
+    if (Number.isNaN(d.getTime())) return value;
+    return d.toLocaleDateString(lang === 'vi' ? "vi-VN" : "en-US");
+  };
+
   const userName = useMemo(() => {
-    return userEmail?.split("@")[0] || "Người Dùng";
-  }, [userEmail]);
+    return userEmail?.split("@")[0] || (lang === 'vi' ? "Người Dùng" : "User");
+  }, [userEmail, lang]);
+
+  // ── Translations ──
+  const T = {
+    pageTitle: lang === 'vi' ? '👤 Hồ Sơ Cá Nhân' : '👤 Personal Profile',
+    pageSubtitle: lang === 'vi' ? 'Theo dõi hành trình trải bài và năng lượng hiện có của bạn' : 'Track your reading journey and available energy',
+    email: '📧 Email',
+    firstActivity: lang === 'vi' ? '🗓 Hoạt động đầu tiên' : '🗓 First activity',
+    lastActivity: lang === 'vi' ? '⏱ Gần nhất' : '⏱ Most recent',
+    currentTokens: lang === 'vi' ? '🔋 Token hiện có' : '🔋 Available tokens',
+    totalReadings: lang === 'vi' ? 'Tổng lượt rút' : 'Total readings',
+    tokensUsed: lang === 'vi' ? 'Token đã dùng' : 'Tokens used',
+    topTopic: lang === 'vi' ? 'Chủ đề nổi bật' : 'Top topic',
+    currentPkg: lang === 'vi' ? '🎁 Gói bạn đang sử dụng' : '🎁 Your current package',
+    loadingPkg: lang === 'vi' ? 'Đang tải...' : 'Loading...',
+    noPkg: lang === 'vi' ? 'Chưa có gói đang hoạt động.' : 'No active package.',
+    startedAt: lang === 'vi' ? 'Bắt đầu:' : 'Started:',
+    expiresAt: lang === 'vi' ? 'Hết hạn:' : 'Expires:',
+    adminBtn: lang === 'vi' ? 'Vào Trang Quản Trị' : 'Enter Admin Panel',
+    logoutBtn: lang === 'vi' ? 'Đăng xuất tài khoản' : 'Logout',
+    historyTitle: lang === 'vi' ? '📖 Lịch Sử Tu Tập' : '📖 Reading History',
+    historyDesc: lang === 'vi' ? 'Các lần trải bài và khai mở trước đó' : 'Previous readings and revelations',
+    refreshBtn: lang === 'vi' ? 'Làm mới' : 'Refresh',
+    loadingProfile: lang === 'vi' ? 'Đang tải dữ liệu hồ sơ...' : 'Loading profile data...',
+    noHistory: lang === 'vi' ? 'Chưa có lịch sử trải bài.' : 'No reading history yet.',
+    thDate: lang === 'vi' ? 'NGÀY GIỜ' : 'DATE',
+    thTopic: lang === 'vi' ? 'CHỦ ĐỀ' : 'TOPIC',
+    thQuestion: lang === 'vi' ? 'CÂU HỎI' : 'QUESTION',
+    thCards: lang === 'vi' ? 'LÁ BÀI' : 'CARDS',
+    thToken: 'TOKEN',
+    thDetail: lang === 'vi' ? 'CHI TIẾT' : 'DETAILS',
+    thAction: lang === 'vi' ? 'HÀNH ĐỘNG' : 'ACTION',
+    noQuestion: lang === 'vi' ? 'Không có câu hỏi cụ thể' : 'No specific question',
+    viewDetail: lang === 'vi' ? 'Xem chi tiết' : 'View details',
+    noAnswer: lang === 'vi' ? 'Không có nội dung luận giải.' : 'No reading content.',
+    errorLoadProfile: lang === 'vi' ? 'Không tải được dữ liệu hồ sơ.' : 'Failed to load profile data.',
+    errorLoadPkg: lang === 'vi' ? 'Không tải được gói hiện tại.' : 'Failed to load current package.',
+  };
 
   const loadHistory = async () => {
     if (!userEmail.trim()) {
@@ -110,13 +162,13 @@ const ProfilePage = ({ userEmail, currentTokens }: ProfilePageProps) => {
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data?.detail || "Không tải được dữ liệu hồ sơ.");
+        throw new Error(data?.detail || T.errorLoadProfile);
       }
 
       setHistory(Array.isArray(data?.items) ? data.items : []);
     } catch (err) {
       console.error("Profile history error:", err);
-      setError(err instanceof Error ? err.message : "Không tải được dữ liệu hồ sơ.");
+      setError(err instanceof Error ? err.message : T.errorLoadProfile);
       setHistory([]);
     } finally {
       setLoading(false);
@@ -139,7 +191,7 @@ const ProfilePage = ({ userEmail, currentTokens }: ProfilePageProps) => {
       const data: ProfileSummaryResponse = await res.json();
 
       if (!res.ok || !data?.success) {
-        throw new Error("Không tải được gói hiện tại.");
+        throw new Error(T.errorLoadPkg);
       }
 
       setCurrentPackage(
@@ -199,14 +251,14 @@ const ProfilePage = ({ userEmail, currentTokens }: ProfilePageProps) => {
   return (
     <div className="profile-page page-container">
       <div className="page-header">
-        <h1>👤 Hồ Sơ Cá Nhân</h1>
+        <h1>{T.pageTitle}</h1>
         <p className="subtitle">
-          Theo dõi hành trình trải bài và năng lượng hiện có của bạn
+          {T.pageSubtitle}
         </p>
       </div>
 
       <div className="profile-grid">
-        <div className="profile-summary-card">
+        <div className="profile-summary-card glass-panel">
           <div className="profile-avatar-wrap">
             <div className="profile-avatar">
               {userName.charAt(0).toUpperCase()}
@@ -217,19 +269,19 @@ const ProfilePage = ({ userEmail, currentTokens }: ProfilePageProps) => {
 
           <div className="profile-info-list">
             <div className="profile-info-row">
-              <span>📧 Email</span>
+              <span>{T.email}</span>
               <strong>{userEmail || "user@example.com"}</strong>
             </div>
 
             <div className="profile-info-row">
-              <span>🗓 Hoạt động đầu tiên</span>
+              <span>{T.firstActivity}</span>
               <strong>
                 {stats.firstActivity ? formatDateOnly(stats.firstActivity) : "--/--/----"}
               </strong>
             </div>
 
             <div className="profile-info-row">
-              <span>⏱ Gần nhất</span>
+              <span>{T.lastActivity}</span>
               <strong>
                 {stats.latestActivity ? formatDateOnly(stats.latestActivity) : "--/--/----"}
               </strong>
@@ -237,88 +289,120 @@ const ProfilePage = ({ userEmail, currentTokens }: ProfilePageProps) => {
           </div>
 
           <div className="profile-token-box">
-            <span>🔋 Token hiện có</span>
+            <span>{T.currentTokens}</span>
             <strong>{currentTokens}</strong>
           </div>
 
           <div className="profile-stats-grid">
             <div className="profile-mini-stat">
-              <span>Tổng lượt rút</span>
+              <span>{T.totalReadings}</span>
               <strong>{stats.totalReadings}</strong>
             </div>
 
             <div className="profile-mini-stat">
-              <span>Token đã dùng</span>
+              <span>{T.tokensUsed}</span>
               <strong>-{stats.totalSpent}</strong>
             </div>
 
             <div className="profile-mini-stat full">
-              <span>Chủ đề nổi bật</span>
+              <span>{T.topTopic}</span>
               <strong>
                 {topicIconMap[stats.favoriteTopic] || "🔮"}{" "}
-                {topicLabelMap[stats.favoriteTopic] || "Chung"}
+                {topicLabelMap[stats.favoriteTopic] || (lang === 'vi' ? "Chung" : "General")}
               </strong>
             </div>
           </div>
 
-          <div
-            className="profile-current-package"
-            style={{
-              marginTop: 20,
-              padding: 18,
-              borderRadius: 18,
-              background: "rgba(255,255,255,0.03)",
-              border: "1px solid rgba(255,255,255,0.06)",
-            }}
-          >
-            <div
-              style={{
-                fontSize: "0.9rem",
-                color: "#f6d89d",
-                fontWeight: 700,
-                marginBottom: 8,
-              }}
-            >
-              🎁 Gói bạn đang sử dụng
+          <div className="profile-current-package">
+            <div className="package-section-label">
+              {T.currentPkg}
             </div>
 
             {summaryLoading ? (
-              <div style={{ color: "#f3d8ff" }}>Đang tải...</div>
+              <div style={{ color: "#f3d8ff" }}>{T.loadingPkg}</div>
             ) : currentPackage ? (
               <>
-                <div
-                  style={{
-                    color: "#f3d8ff",
-                    fontSize: "1.2rem",
-                    fontWeight: 800,
-                    marginBottom: 6,
-                  }}
-                >
+                <div className="package-display-name">
                   {currentPackage.package_name}
                 </div>
 
-                <div
-                  style={{
-                    color: "#ffcf70",
-                    fontWeight: 700,
-                    marginBottom: 12,
-                  }}
-                >
+                <div className="package-display-badge">
                   {packageBadgeMap[currentPackage.package_code] || currentPackage.package_code}
                 </div>
-
+                <div style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.6)', marginTop: 8 }}>
+                  {T.startedAt} {formatDateOnly(currentPackage.started_at || "")}
+                </div>
+                <div style={{ fontSize: '0.8rem', color: '#ffcf70', marginTop: 4 }}>
+                  {T.expiresAt} {formatDateOnly(currentPackage.ends_at || "")}
+                </div>
               </>
             ) : (
-              <div style={{ color: "#f3d8ff" }}>Chưa có gói đang hoạt động.</div>
+              <div style={{ color: "#f3d8ff" }}>{T.noPkg}</div>
             )}
           </div>
+
+          {localStorage.getItem("role") === "admin" && (
+            <div className="profile-admin-wrap" style={{ marginTop: '20px', width: '100%' }}>
+              <button 
+                type="button" 
+                className="profile-admin-btn"
+                onClick={() => window.location.href = "/admin"}
+                style={{
+                  width: '100%',
+                  padding: '12px',
+                  borderRadius: '12px',
+                  background: 'linear-gradient(135deg, #ffd700, #d4af37)',
+                  color: '#000000',
+                  border: 'none',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  boxShadow: '0 4px 12px rgba(255, 215, 0, 0.2)',
+                  transition: 'all 0.3s ease'
+                }}
+              >
+                <span>🧙‍♂️</span> {T.adminBtn}
+              </button>
+            </div>
+          )}
+
+          {onLogout && (
+            <div className="profile-logout-wrap" style={{ marginTop: '12px', width: '100%' }}>
+              <button 
+                type="button" 
+                className="profile-logout-btn"
+                onClick={onLogout}
+                style={{
+                  width: '100%',
+                  padding: '12px',
+                  borderRadius: '12px',
+                  background: 'linear-gradient(135deg, #ef4444, #b91c1c)',
+                  color: 'white',
+                  border: 'none',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  boxShadow: '0 4px 12px rgba(239, 68, 68, 0.2)',
+                  transition: 'all 0.3s ease'
+                }}
+              >
+                <span>⏻</span> {T.logoutBtn}
+              </button>
+            </div>
+          )}
         </div>
 
-        <div className="profile-history-card">
+        <div className="profile-history-card glass-panel">
           <div className="profile-history-head">
             <div>
-              <h2>📖 Lịch Sử Tu Tập</h2>
-              <p>Các lần trải bài và khai mở trước đó</p>
+              <h2>{T.historyTitle}</h2>
+              <p>{T.historyDesc}</p>
             </div>
 
             <button
@@ -330,49 +414,49 @@ const ProfilePage = ({ userEmail, currentTokens }: ProfilePageProps) => {
               }}
               disabled={loading || summaryLoading}
             >
-              Làm mới
+              {T.refreshBtn}
             </button>
           </div>
 
           {loading ? (
-            <div className="profile-empty">Đang tải dữ liệu hồ sơ...</div>
+            <div className="profile-empty">{T.loadingProfile}</div>
           ) : error ? (
             <div className="profile-empty">{error}</div>
           ) : history.length === 0 ? (
-            <div className="profile-empty">Chưa có lịch sử trải bài.</div>
+            <div className="profile-empty">{T.noHistory}</div>
           ) : (
             <div className="profile-table-wrap">
               <table className="profile-table">
                 <thead>
                   <tr>
-                    <th>NGÀY GIỜ</th>
-                    <th>CHỦ ĐỀ</th>
-                    <th>CÂU HỎI</th>
-                    <th>LÁ BÀI</th>
-                    <th>TOKEN</th>
-                    <th>CHI TIẾT</th>
+                    <th>{T.thDate}</th>
+                    <th>{T.thTopic}</th>
+                    <th>{T.thQuestion}</th>
+                    <th>{T.thCards}</th>
+                    <th>{T.thToken}</th>
+                    <th>{T.thDetail}</th>
                   </tr>
                 </thead>
                 <tbody>
                   {history.map((item) => (
                     <tr key={item.id}>
-                      <td>{formatDateTime(item.created_at)}</td>
-                      <td>
+                      <td data-label={T.thDate}>{formatDateTime(item.created_at)}</td>
+                      <td data-label={T.thTopic}>
                         <span className="profile-topic-pill">
                           {topicIconMap[item.topic] || "🔮"}{" "}
-                          {topicLabelMap[item.topic] || item.topic || "Chung"}
+                          {topicLabelMap[item.topic] || item.topic || (lang === 'vi' ? "Chung" : "General")}
                         </span>
                       </td>
-                      <td>{item.question || "Không có câu hỏi cụ thể"}</td>
-                      <td>{item.cards?.length || 0} 🎴</td>
-                      <td className="profile-token-spent">-{READING_COST}</td>
-                      <td>
+                      <td data-label={T.thQuestion}>{translateQuestion(item.question) || T.noQuestion}</td>
+                      <td data-label={T.thCards}>{item.cards?.length || 0} 🎴</td>
+                      <td data-label={T.thToken} className="profile-token-spent">-{READING_COST}</td>
+                      <td data-label={T.thAction}>
                         <button
                           type="button"
                           className="profile-view-btn"
                           onClick={() => setSelectedItem(item)}
                         >
-                          Xem
+                          {T.viewDetail}
                         </button>
                       </td>
                     </tr>
@@ -390,16 +474,16 @@ const ProfilePage = ({ userEmail, currentTokens }: ProfilePageProps) => {
           onClick={() => setSelectedItem(null)}
         >
           <div
-            className="profile-modal"
+            className="profile-modal glass-panel"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="profile-modal-head">
               <div>
                 <h3>
                   {topicIconMap[selectedItem.topic] || "🔮"}{" "}
-                  {topicLabelMap[selectedItem.topic] || selectedItem.topic || "Chung"}
+                  {topicLabelMap[selectedItem.topic] || selectedItem.topic || (lang === 'vi' ? "Chung" : "General")}
                 </h3>
-                <p>{selectedItem.question || "Không có câu hỏi cụ thể"}</p>
+                <p>{translateQuestion(selectedItem.question) || T.noQuestion}</p>
               </div>
 
               <button
@@ -425,7 +509,7 @@ const ProfilePage = ({ userEmail, currentTokens }: ProfilePageProps) => {
             </div>
 
             <div className="profile-modal-answer">
-              {selectedItem.answer || "Không có nội dung luận giải."}
+              {selectedItem.answer || T.noAnswer}
             </div>
           </div>
         </div>

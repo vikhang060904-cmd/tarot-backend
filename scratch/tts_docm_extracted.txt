@@ -1,0 +1,313 @@
+Automatic Text-to-Speech System for Vietnamese Using Artificial Intelligence
+
+Thanh-Danh Vo1, Ngo-Ho Anh-Khoa1 and Ngo-Ho Anh-Khoi1*
+
+1 Faculty of Information Technology, Nam Can Tho University, 168 Nguyen Van Cu Street, An Binh Ward, Can Tho City, Vietnamdanh223566@nctu.edu.vn, nhakhoa@nctu.edu.vn, nhakhoi@nctu.edu.vn
+
+Abstract. In the context of digital transformation and the rapid advancement of artificial intelligence, the demand for Text‑to‑Speech (TTS) systems has become increasingly critical across domains such as virtual assistants, education, automatic call centers, and accessibility tools for the visually impaired. However, generating natural, context‑aware, and prosodically appropriate speech remains a significant challenge, particularly for Vietnamese—a tonal language with complex pitch contours and regional diversity. This research proposes and develops a Vietnamese TTS system built upon modern deep learning models to overcome the limitations of traditional methods. The system leverages state‑of‑the‑art architectures including Tacotron, FastSpeech, and VITS, combined with machine learning techniques to enhance synthesis quality. Construction and evaluation are performed on a diverse Vietnamese dataset, ensuring adaptability to multiple real‑world contexts. Results demonstrate that the system achieves natural, clear, highly flexible speech output with broad potential for deployment in digital platforms and intelligent services.
+
+Keywords: Text‑to‑Speech (TTS), Artificial Intelligence (AI), Deep Learning, Natural Language Processing (NLP), Speech Synthesis.
+
+Introduction
+
+Driven by digital transformation and the progress of artificial intelligence, the need to build Text‑to‑Speech (TTS) systems is becoming ever more important in areas such as virtual assistants, education, automatic call centers, and support for the visually impaired. The TTS problem, however, extends beyond simply converting text into audio; it demands that the synthesized voice be natural, carry appropriate intonation, and fit the given context—a particularly difficult task for Vietnamese, a language with a complex tone system and substantial regional variation (Do, 2026).
+
+Traditional concatenative and formant‑based TTS methods (Zen et al., 2019) and Hidden Markov Model (HMM)‑based synthesis (Zen et al., 2019) exhibit limitations in flexibility, naturalness, and scalability. In response, modern deep learning models such as Tacotron (Wang et al., 2017), Tacotron 2 (Shen et al., 2018), FastSpeech (Ren et al., 2019, 2020), and VITS (Kim et al., 2021) have opened more effective avenues by learning directly from data. Building on these advances, this study focuses on the research and development of a Vietnamese TTS system aimed at improving voice quality and practical applicability.
+
+Related Work
+
+The Vietnamese TTS market features several prominent domestic platforms alongside international solutions. FPT Smart Cloud Text to Speech, developed by FPT Corporation, delivers a high‑quality Vietnamese TTS service through a commercial API (Vu et al., 2025; Nguyen, 2023). It applies deep learning architectures such as Tacotron (Wang et al., 2017) and Transformer variants (Vaswani et al., 2017) together with vocoders like WaveNet (Oord et al., 2016) and HiFi‑GAN (Kong et al., 2020) to produce natural, region‑diverse voices with controllable speed, pitch, and pausing. The system is extensively used in interactive voice response (IVR), audiobooks, virtual assistants, and online education (Do, 2026). Viettel AI Text‑to‑Speech offers a SaaS‑based solution optimized for Vietnamese (Vu et al., 2025; Nguyen, 2023), employing advanced neural models trained on large‑scale, Vietnamese‑specific speech corpora to ensure accurate pronunciation, natural breaks, and expressive output (Do, 2026; Oord et al., 2016; Kong et al., 2020). Zalo AI Text to Speech, a product of VNG Corporation, integrates deep NLP models like PhoBERT (Nguyen & Tuan, 2020) and BERT‑style pre‑training (Devlin et al., 2019) with synthesis architectures including Tacotron, FastSpeech, and VITS (Wang et al., 2017; Ren et al., 2019; Kim et al., 2021), leveraging massive user data to support multiple speaking styles (Vu et al., 2025). Voice.vn specializes in speech synthesis and voice cloning (Vu et al., 2025) using end‑to‑end models like VITS (Kim et al., 2021) and voice conversion techniques (Casanova et al., 2022; Chen et al., 2022), enabling high‑fidelity voice cloning and customization for advertising, podcasting, and gaming. Google AI Studio provides a cloud‑based environment for TTS via the Gemini family and Google Cloud Text‑to‑Speech (Vaswani et al., 2017; Ren et al., 2019), featuring multi‑lingual, natural, and context‑adaptive voice generation (Casanova et al., 2022; Shen et al., 2018). EventLab offers TTS and voice cloning tools built on end‑to‑end TTS (Wang et al., 2017) and speaker embedding models (Chen et al., 2022; Kim et al., 2021; Casanova et al., 2022). Overall, the market is shifting from simple text‑reading systems toward intelligent communication platforms, with strong trends in voice cloning (Jia et al., 2018) and multimodal AI.
+
+The open‑source community has contributed a range of Vietnamese TTS models. VietTTS is a representative system built with encoder‑decoder or Transformer architectures (Wang et al., 2017; Vaswani et al., 2017; Ren et al., 2019), trained on carefully normalized Vietnamese data (Do, 2026) to handle tones, compound words, and sentence structures, offering near‑real‑time latency suitable for virtual assistants, e‑learning, and audiobook production (Nguyen, 2023; Vu et al., 2025). NeuTTS‑Air focuses on lightweight, efficient inference, balancing voice quality and speed to operate on CPUs or low‑resource devices (Ren et al., 2019, 2020; Kim et al., 2021), optimized for chatbots, IVR, and IoT applications (Ping et al., 2017; Kalchbrenner et al., 2018). Kani‑TTS is a large‑scale model with approximately 370 million parameters, aiming for high expressiveness and professional audio quality (Kim et al., 2021; Casanova et al., 2022), excelling in audiobook and media production but requiring powerful GPUs for deployment (Ren et al., 2019; Ping et al., 2017; Kalchbrenner et al., 2018). VieNeu‑TTS combines TTS with voice cloning, extracting speaker characteristics via techniques like AutoVC (Qian et al., 2019) and StarGAN‑VC (Kameoka et al., 2018) and applying them to synthesized speech (Casanova et al., 2022; Jia et al., 2018), enabling strong personalization but also raising ethical and security concerns. ViXTTS serves as a demonstration project for voice cloning, illustrating the technology for rapid experimentation (Thinh, 2024; Kim et al., 2021). Valtec‑TTS is a compact model optimized for extremely resource‑constrained environments such as embedded devices and IoT (Ren et al., 2019, 2020; Ping et al., 2017; Kalchbrenner et al., 2018), delivering adequate clarity for simple notification and guidance applications. Collectively, these models illustrate the maturation of Vietnamese TTS, with specialized branches ranging from high‑quality synthesis to lightweight deployment and voice personalization.
+
+Data quality is foundational for TTS. The VLSP Speech Corpus is a large, acadeically oriented dataset with multi‑speaker recordings in controlled conditions (Ardila et al., 2020; Vu et al., 2025), richly annotated with phonetic and regional information (Yamagishi et al., 2019; Do, 2026). VIVOS is a smaller open‑source corpus (around 10–20 hours) of clean read speech (Ardila et al., 2020; Ito & Johnson, 2017), widely used for initial modeling despite limited emotional and real‑world diversity (Do, 2026). Commercial datasets from FPT Corporation, Viettel Group, and VNG Corporation are far larger and more detailed. FPT’s dataset comprises hundreds to thousands of hours of studio‑quality recordings with exhaustive annotations (Vu et al., 2025; Do, 2026; Oord et al., 2016; Kong et al., 2020). Viettel’s data blends studio and real‑world recordings covering diverse accents (Vu et al., 2025; Yamagishi et al., 2019; Jia et al., 2018; Do, 2026). Zalo’s data benefits from its broad user ecosystem, incorporating contemporary language use (Vu et al., 2025; Nguyen & Tuan, 2020; Devlin et al., 2019; Kim et al., 2021). Additionally, VietTTS provides a basic open dataset with text–audio pairs sufficient for small‑scale experiments (Nguyen, 2023; Ito & Johnson, 2017; Vu et al., 2025). Overall, dataset scale, diversity, annotation depth, and realism directly determine TTS performance. 
+
+System Design
+
+Early TTS systems relied on concatenative and formant‑based methods, which assemble or mathematically model speech units but suffer from inflexibility, high database costs, and unnatural prosody (Zen et al., 2019). Statistical parametric synthesis using Hidden Markov Models (HMM) improved flexibility but still produced monotonous, less natural output (Zen et al., 2019). The advent of deep learning brought end‑to‑end models such as Tacotron and Tacotron 2, which employ encoder–decoder architectures with attention to directly map text to mel‑spectrograms, followed by vocoders like WaveNet (Oord et al., 2016) or WaveGlow (Prenger et al., 2019) to generate waveforms (Wang et al., 2017; Shen et al., 2018; Vaswani et al., 2017). These models automatically learn phonetic and prosodic features, yielding significantly more natural speech, but have limitations in inference speed and attention errors. FastSpeech and FastSpeech 2 addressed these issues by removing attention during inference and using duration, pitch, and energy predictors, achieving faster and more stable synthesis with explicit prosody control (Ren et al., 2019, 2020; Vaswani et al., 2017). The latest leap, VITS, integrates a variational autoencoder (Kingma & Welling, 2014) with a generative adversarial network (Goodfellow et al., 2014) to directly generate waveforms from text in a single end‑to‑end framework, eliminating a separate vocoder and further boosting quality and efficiency (Kim et al., 2021; Casanova et al., 2022). Voice cloning and multi‑speaker synthesis have also advanced, using speaker embeddings and style tokens to enable personalization and zero‑shot adaptation (Jia et al., 2018; Casanova et al., 2022; Chen et al., 2022; Wang et al., 2018). Additionally, transfer and self‑supervised learning methods (Baevski et al., 2020; Hsu et al., 2021; Radford et al., 2022) mitigate data scarcity for Vietnamese by pretraining on large multilingual corpora. A modern TTS pipeline typically includes data collection and preprocessing, text normalization (Do, 2026), model training, and waveform generation (Wang et al., 2017; Kim et al., 2021).
+
+The proposed system implements an emotional TTS pipeline: input text containing emotion tags is segmented by emotion, each segment is synthesized via viXTTS, and the resulting waveforms are concatenated with silence gaps to produce the final audio file
+
+Fig. 1. Workflow of the Proposed Emotion-Based Speech Synthesis System
+
+EMOTION_MAP = { cheerful→cheerful_ref.wav, excited→excited_ref.wav,                calm→calm_ref.wav, sad→calm_ref.wav, neutral→base_voice.wav }ALGORITHM EmotionalTTS(text, ref_audio, output.wav):    chunks ← split_by_emotion(text)    IF chunks is empty: ERROR    (latent, embed) ← get_speaker_latents(ref_audio)    waveforms ← []    FOR EACH (t, e) IN chunks:        w ← viXTTS.inference(t, latent, embed)        waveforms.append(w)    output ← concatenate waveforms with 300 ms silence between    SAVE output → output.wavEMOTION_MAP = { cheerful→cheerful_ref.wav, excited→excited_ref.wav,                calm→calm_ref.wav, sad→calm_ref.wav, neutral→base_voice.wav }ALGORITHM EmotionalTTS(text, ref_audio, output.wav):    chunks ← split_by_emotion(text)    IF chunks is empty: ERROR    (latent, embed) ← get_speaker_latents(ref_audio)    waveforms ← []    FOR EACH (t, e) IN chunks:        w ← viXTTS.inference(t, latent, embed)        waveforms.append(w)    output ← concatenate waveforms with 300 ms silence between    SAVE output → output.wavFUNCTION split_by_emotion(text):    iterate each line; if line contains '(' → close current chunk,        detect_emotion(line), start new chunk    else → append to current chunk    each chunk: clean_text (remove tags, normalize Vietnamese)    return chunksFUNCTION split_by_emotion(text):    iterate each line; if line contains '(' → close current chunk,        detect_emotion(line), start new chunk    else → append to current chunk    each chunk: clean_text (remove tags, normalize Vietnamese)    return chunksIn the first layer, text is scanned line by line. When a line contains an emotion tag in parentheses, the system maps it to an emotion label using a Vietnamese keyword dictionary. Consecutive lines sharing the same emotion are grouped into a chunk of (text, emotion). Before synthesis, the text is cleaned by removing tag content, normalizing spaces, and standardizing Vietnamese orthography. In the second layer, each chunk is passed to the viXTTS inference engine together with speaker characteristics extracted from a reference audio file. An emotion map assigns a reference file per emotion (e.g., neutral → base_voice.wav, cheerful → cheerful_ref.wav). To maintain consistent speaker identity, latent speaker embeddings are extracted once from a user‑provided voice sample and reused across all chunks (Jia et al., 2018; Casanova et al., 2022). The synthesis produces a waveform for each chunk, as formalized in the following algorithm
+
+EMOTION_MAP = { cheerful→cheerful_ref.wav, excited→excited_ref.wav,
+
+                calm→calm_ref.wav, sad→calm_ref.wav, neutral→base_voice.wav }
+
+ALGORITHM EmotionalTTS(text, ref_audio, output.wav):
+
+    chunks ← split_by_emotion(text)
+
+    IF chunks is empty: ERROR
+
+    (latent, embed) ← get_speaker_latents(ref_audio)
+
+    waveforms ← []
+
+    FOR EACH (t, e) IN chunks:
+
+        w ← viXTTS.inference(t, latent, embed)
+
+        waveforms.append(w)
+
+    output ← concatenate waveforms with 300 ms silence between
+
+    SAVE output → output.wav
+
+EMOTION_MAP = { cheerful→cheerful_ref.wav, excited→excited_ref.wav,
+
+                calm→calm_ref.wav, sad→calm_ref.wav, neutral→base_voice.wav }
+
+ALGORITHM EmotionalTTS(text, ref_audio, output.wav):
+
+    chunks ← split_by_emotion(text)
+
+    IF chunks is empty: ERROR
+
+    (latent, embed) ← get_speaker_latents(ref_audio)
+
+    waveforms ← []
+
+    FOR EACH (t, e) IN chunks:
+
+        w ← viXTTS.inference(t, latent, embed)
+
+        waveforms.append(w)
+
+    output ← concatenate waveforms with 300 ms silence between
+
+    SAVE output → output.wav
+
+FUNCTION split_by_emotion(text):
+
+    iterate each line; if line contains '(' → close current chunk,
+
+        detect_emotion(line), start new chunk
+
+    else → append to current chunk
+
+    each chunk: clean_text (remove tags, normalize Vietnamese)
+
+    return chunks
+
+FUNCTION split_by_emotion(text):
+
+    iterate each line; if line contains '(' → close current chunk,
+
+        detect_emotion(line), start new chunk
+
+    else → append to current chunk
+
+    each chunk: clean_text (remove tags, normalize Vietnamese)
+
+    return chunks
+
+In the third layer, the generated waveforms are concatenated sequentially with 300 ms of silence inserted to separate emotional turns and avoid abrupt cuts. The final output is saved as a WAV file. This design effectively combines keyword‑based emotion classification with conditional TTS and audio post‑processing, enabling tag‑driven, expressive speech synthesis using a unified voice identity.
+
+Evaluation Metrics
+
+To comprehensively assess the text‑to‑speech and voice cloning system, two complementary deep‑learning‑based metrics are employed: speaker similarity via Resemblyzer, and perceived speech quality via DNSMOS.
+
+Resemblyzer is a neural network‑based tool for speaker verification and voice similarity measurement (Mishra et al., 2023). At its core, it employs a speaker verification encoder trained with a generalized end‑to‑end loss (Wan et al., 2018). The operational principle is as follows: first, an input utterance—either the original reference voice or the synthesized cloned voice—is processed by a deep neural network that extracts a fixed‑dimensional embedding vector (often referred to as a d‑vector or speaker embedding). This vector is designed to capture the unique vocal identity of the speaker, including characteristics such as timbre, pitch contour, and speaking style, while being largely invariant to the linguistic content or the specific words spoken. In other words, regardless of what the person says, the embedding should remain consistent for the same speaker and distinctly different for different speakers (Wan et al., 2018).
+
+Once the embedding vectors are obtained for both the reference audio A (the original speaker’s voice) and the synthesized audio B (the cloned voice), their similarity is quantified using the cosine similarity metric:
+
+The cosine similarity measures the angle between the two vectors in the high‑dimensional embedding space. A value close to 1 indicates that the vectors point in nearly the same direction, meaning the two voices are perceived as highly similar or almost identical in terms of speaker identity (Jia et al., 2018; Wan et al., 2018). Conversely, a value close to 0 or negative would suggest dissimilar speakers. Thus, Resemblyzer provides an objective, automatic, and reproducible metric for evaluating how faithfully a voice cloning system preserves the original speaker’s vocal characteristics.
+
+DNSMOS (Deep Noise Suppression Mean Opinion Score) is a non‑intrusive, deep‑learning‑based metric designed to estimate the perceptual quality of speech signals without requiring a clean reference audio (Reddy et al., 2021). This is particularly advantageous in real‑world scenarios where a pristine original is unavailable. The working mechanism of DNSMOS involves two main stages. First, the input audio waveform is transformed into a log‑power spectrogram X, computed with a 20 ms frame length, a 10 ms frame shift, and a 320‑point Fast Fourier Transform (FFT). This time‑frequency representation captures both the spectral content of the speech and any potential distortions or background noise.
+
+Second, this spectrogram is fed into a pre‑trained convolutional neural network f θ. The architecture typically consists of several convolutional layers for feature extraction, followed by a global max‑pooling layer to aggregate information across time, and finally three separate dense (fully connected) output heads. These three heads jointly predict three scores on the standard 1–5 Mean Opinion Score scale:
+
+where OVRL represents the overall perceived quality of the audio, encompassing all aspects of the listening experience; SIG specifically quantifies the clarity and naturalness of the speech signal itself, indicating how clean and undistorted the voice sounds; and BAK measures the intrusiveness of background noise, with a higher score meaning less noticeable background interference (Reddy et al., 2021). The model is trained using mean squared error loss against human subjective ratings collected according to the ITU‑T P.835 standard, enabling it to approximate human judgments of speech quality directly from the degraded audio.
+
+By combining Resemblyzer and DNSMOS, the evaluation framework captures two essential and complementary dimensions of a cloned voice: how faithfully the speaker’s identity is preserved (similarity) and how natural, clear, and noise‑free the synthesised speech sounds (quality). This dual approach enables a robust, fully automatic, and objective performance analysis.
+
+Experiments and Results
+
+Training Dataset. To support high‑fidelity voice cloning and natural prosody, a dedicated multi‑speaker Vietnamese speech corpus was constructed. The dataset contains approximately 25 hours of studio‑quality recordings from 12 native speakers (6 male, 6 female) representing the three main regional accents (Northern, Central, Southern). Each speaker recorded an average of 2 hours of phonetically balanced scripts, covering everyday conversations, news passages, numeric sequences, and emotional utterances. All audio was captured at 48 kHz/24‑bit in a noise‑treated environment using a large‑diaphragm condenser microphone, then down‑sampled to 24 kHz mono for training.
+
+The preprocessing pipeline was designed to eliminate variability that could degrade speaker similarity. Steps included: (i) manual verification of transcript accuracy to ensure perfect alignment; (ii) text normalization using VietNormalizer (Do, 2026) to expand abbreviations, convert numbers to words, and standardize punctuation; (iii) phonetic alignment with a forced aligner trained on Vietnamese, yielding frame‑level phoneme boundaries; (iv) energy‑based silence stripping at the beginning and end of utterances to remove leading/trailing silence; and (v) loudness normalization to −23 LUFS to maintain consistent perceived volume across speakers. Crucially, for each speaker a high‑quality speaker embedding was extracted using the Resemblyzer encoder and stored as a reference vector. Conditioning the generative model on these embeddings during training encourages the decoder to preserve speaker identity, which directly contributed to the high cosine similarity scores (0.90+) observed in the experiments.
+
+Experimental Setup. The evaluation was conducted on a GIGABYTE G5 GD laptop, a gaming‑oriented notebook whose specifications are listed in Table 1. Notably, the system features a dedicated NVIDIA GeForce RTX GPU (Ampere architecture, discrete) alongside an integrated Intel UHD Graphics adapter. However, the PyTorch environment used for inference was a CPU‑only build, meaning all synthesis operations ran on the Intel Core i5‑11400H CPU without GPU acceleration. This configuration reflects a common deployment scenario where CUDA drivers or libraries are not installed, or where the system prioritizes compatibility over maximum speed.
+
+Table 1. System configuration of the test platform.
+
+Component
+
+Specification
+
+Model
+
+GIGABYTE G5 GD
+
+CPU
+
+Intel Core i5‑11400H (8 cores, 12 threads, 2.70 GHz base)
+
+RAM
+
+16 GB DDR4 (15.8 GB usable)
+
+GPU
+
+Intel UHD Graphics (integrated)
+
+Discrete GPU
+
+NVIDIA GeForce RTX (Ampere, dedicated)
+
+OS
+
+Windows 11 Home Single Language (Build 26200)
+
+Inference Backend
+
+PyTorch CPU‑only, 4 threads
+
+Voice Similarity and Speech Quality. The system was evaluated by comparing original and synthesized (cloned) speech samples from four speakers. Each sample pair consisted of a reference .wav file and its clone. Two assessment methods were applied: Resemblyzer for voice similarity (Wan et al., 2018; Mishra et al., 2023), and DNSMOS for perceived audio quality (Reddy et al., 2021). Voice similarity results are presented in Table 2. All pairs achieve a cosine similarity of approximately 0.90 (ranging from 0.9013 to 0.9346), confirming that the VITS model, despite running on the CPU, preserves vocal timbre and speaker identity remarkably well (Jia et al., 2018).
+
+Table 2. Voice similarity between original and cloned speech.
+
+Cập audio
+
+Độ tương đồng
+
+giong_goc và giong_clone
+
+0.9038
+
+Danh_1 và Danh_clone
+
+0.9019
+
+Khang1 và Khang_clone
+
+0.9346
+
+Ngoc1 và Ngoc_clone
+
+0.9013
+
+Speech quality results from DNSMOS are summarized in Table 2. Overall quality (OVRL) ranges from 3.08 to 3.38, indicating good perceived quality. Speech quality (SIG) falls between 3.44 and 3.62, showing the voice is relatively clear and easy to understand. Background noise (BAK) consistently exceeds 3.8, reaching up to 4.14, reflecting very low background intrusion (Reddy et al., 2021).
+
+Table 3. DNSMOS evaluation of cloned speech quality.
+
+File audio
+
+OVRL MOS
+
+SIG MOS
+
+BAK MOS
+
+P808 MOS
+
+giong_clone.wav
+
+3.38
+
+3.60
+
+4.14
+
+4.03
+
+VietNeu_TTS.wav
+
+3.31
+
+3.54
+
+4.16
+
+3.68
+
+Real‑Time Performance and Latency Analysis: The most critical performance metric of the current prototype is the end‑to‑end synthesis latency. For a typical input text of 750 characters (equivalent to approximately 50 seconds of generated audio at a standard Vietnamese speaking rate of about 900 characters per minute), the system requires roughly 2 minutes and 50 seconds (170 seconds) to produce the final WAV file. This yields a Real‑Time Factor (RTF) of approximately 3.4, well above the real‑time threshold of 1.0. The latency is not fixed, however; it varies measurably depending on the linguistic complexity of the input text. Two factors dominate the additional processing overhead:
+
+Emotion tags. Each emotional boundary forces a new synthesis chunk with a separate viXTTS inference call, leading to multiple context switch and model loading overheads. More tags increase the number of chunks and the cumulative pause insertion time.
+
+English words and non Vietnamese segments. These require extra grapheme to phoneme steps within the text normalization layer (Do, 2026), and may introduce attention errors that force the decoder to retry alignment, adding to the total runtime.
+
+The observed latency stems from running the full VITS pipeline on the CPU without utilizing the available RTX GPU. The CPU‑only PyTorch build cannot exploit the massive parallelism of the GPU’s tensor cores, leaving matrix multiplications and convolutions to be computed sequentially. Despite this, the system remains acceptable for near‑line content creation tasks such as podcast dubbing, educational narration, or voicemail generation—applications where a few minutes of rendering time are tolerated in exchange for high‑quality, emotionally expressive output.
+
+Critically, the machine is equipped with an NVIDIA GeForce RTX GPU, which is fully capable of accelerating the inference. Moving to a CUDA‑enabled PyTorch installation would reduce the RTF to well below 0.1 (based on typical GPU benchmarks for VITS), enabling real‑time streaming synthesis. In addition, model quantization to FP16 or INT8, and switching to optimized inference engines like ONNX Runtime with OpenVINO, could further halve latency while preserving the high similarity and MOS scores.
+
+Conclusion
+
+In this research, a Vietnamese text‑to‑speech system based on artificial intelligence and deep learning was thoroughly designed, implemented, and evaluated. The system exploits modern models such as Tacotron, FastSpeech, and VITS to automatically convert text into natural speech signals, learning the unique phonetic and prosodic features of Vietnamese. Experimental outcomes show that the proposed model generates clear, natural speech with appropriate intonation and maintains stable performance across various conditions and contexts.
+
+The achieved results not only validate the effectiveness of deep learning in Vietnamese speech synthesis but also highlight the system’s broad applicability in practice, notably in virtual assistants, education, automatic call centers, and assistive tools for the visually impaired. Future work may focus on expanding and enriching the speech dataset, improving regional naturalness, optimizing models for resource‑constrained devices, and integrating the system into real‑world platforms to enhance feasibility and usability.
+
+References
+
+Ardila, R., Branson, M., Davis, K., Henretty, M., Kohler, M., Meyer, J., … & Weber, G. (2020). Common Voice: A massively‑multilingual speech corpus. arXiv. https://arxiv.org/abs/1912.06670
+
+Baevski, A., Zhou, Y., Mohamed, A., & Auli, M. (2020). wav2vec 2.0: A framework for self‑supervised learning of speech representations. arXiv. https://arxiv.org/abs/2006.11477
+
+Casanova, E., Weber, J., Shulby, C. N., Junior, A. S., Gölge, E., & Ponti, M. A. (2022). YourTTS: Towards zero‑shot multi‑speaker TTS and zero‑shot voice conversion for everyone. arXiv. https://arxiv.org/abs/2112.02418
+
+Chen, M., Baevski, A., Likhomanenko, T., Kahn, J., Pratap, V., Conneau, A., … & Auli, M. (2022). WavLM: Large‑scale self‑supervised pre‑training for full stack speech processing. arXiv. https://arxiv.org/abs/2110.13900
+
+Devlin, J., Chang, M. W., Lee, K., & Toutanova, K. (2019). BERT: Pre‑training of deep bidirectional transformers for language understanding. arXiv. https://arxiv.org/abs/1810.04805
+
+Do, N. (2026). VietNormalizer: An open‑source, dependency‑free Python library for Vietnamese text normalization in TTS and NLP applications. arXiv. https://arxiv.org/abs/2603.04145
+
+Goodfellow, I., Pouget‑Abadie, J., Mirza, M., Xu, B., Warde‑Farley, D., Ozair, S., … & Bengio, Y. (2014). Generative adversarial networks. arXiv. https://arxiv.org/abs/1406.2661
+
+Hsu, W. N., Bolte, B., Tsai, Y. H. H., Lakhotia, K., Salakhutdinov, R., & Mohamed, A. (2021). HuBERT: Self‑supervised speech representation learning by masked prediction of hidden units. arXiv. https://arxiv.org/abs/2104.05136
+
+Ito, K., & Johnson, L. (2017). The LJ Speech Dataset. https://keithito.com/LJ-Speech-Dataset/
+
+Jia, Y., Zhang, Y., Weiss, R. J., Wang, Q., Shen, J., Ren, X., … & Wu, Y. (2018). Transfer learning from speaker verification to multispeaker text‑to‑speech synthesis. Advances in Neural Information Processing Systems, 31. https://proceedings.neurips.cc/paper/2018/hash/6832a7b24bc06775d02b7406880b93fc-Abstract.html
+
+Kalchbrenner, N., Elsen, E., Simonyan, K., Noury, S., Casagrande, N., Lockhart, E., … & Kavukcuoglu, K. (2018). Efficient neural audio synthesis. arXiv. https://arxiv.org/abs/1802.08435
+
+Kameoka, H., Kaneko, T., Tanaka, K., & Hojo, N. (2018). StarGAN‑VC: Non‑parallel many‑to‑many voice conversion using star generative adversarial networks. arXiv. https://arxiv.org/abs/1806.02169
+
+Kim, J., Kong, J., & Son, J. (2021). Conditional variational autoencoder with adversarial learning for end‑to‑end text‑to‑speech. arXiv. https://arxiv.org/abs/2106.06103
+
+Kingma, D. P., & Welling, M. (2014). Auto‑encoding variational bayes. arXiv. https://arxiv.org/abs/1312.6114
+
+Kong, J., Kim, J., & Bae, J. (2020). HiFi‑GAN: Generative adversarial networks for efficient and high fidelity speech synthesis. arXiv. https://arxiv.org/abs/2010.05646
+
+Mishra, P., Choudhury, J. A., Kho, E., Basu, B., & Nandi, A. (2023). Speaker identification, differentiation and verification using deep learning for human machine interface. In 2023 Photonics & Electromagnetics Research Symposium (PIERS) (pp. 861–870). IEEE. https://ieeexplore.ieee.org/document/10221344
+
+Nguyen, D. Q., & Tuan, N. D. (2020). PhoBERT: Pre‑trained language models for Vietnamese. arXiv. https://arxiv.org/abs/2003.00744
+
+Nguyen, N. (2023). VietTTS: Vietnamese text to speech library. GitHub. https://github.com/NTT123/vietTTS
+
+Oord, A. v. d., Dieleman, S., Zen, H., Simonyan, K., Vinyals, O., Graves, A., … & Kavukcuoglu, K. (2016). WaveNet: A generative model for raw audio. arXiv. https://arxiv.org/abs/1609.03499
+
+Ping, W., Peng, K., Gibiansky, A., Arik, S. O., Kannan, A., Narang, S., … & Sengupta, S. (2017). Deep Voice 3: Scaling text‑to‑speech with convolutional sequence learning. arXiv. https://arxiv.org/abs/1710.07654
+
+Prenger, R., Valle, R., & Catanzaro, B. (2019). WaveGlow: A flow‑based generative network for speech synthesis. arXiv. https://arxiv.org/abs/1811.00002
+
+Qian, K., Zhang, Y., Chang, S., Yang, X., & Hasegawa‑Johnson, M. (2019). AutoVC: Zero‑shot voice style transfer with only autoencoder loss. arXiv. https://arxiv.org/abs/1905.05879
+
+Radford, A., Kim, J. W., Xu, T., Brockman, G., McLeavey, C., & Sutskever, I. (2022). Robust speech recognition via large‑scale weak supervision (Whisper). arXiv. https://arxiv.org/abs/2212.04356
+
+Reddy, C. K., Gopal, V., & Cutler, R. (2021). DNSMOS: A non‑intrusive perceptual objective speech quality metric to evaluate noise suppressors. In ICASSP 2021‑2021 IEEE International Conference on Acoustics, Speech and Signal Processing (pp. 6493–6497). IEEE. https://arxiv.org/abs/2010.15258
+
+Ren, Y., Ruan, Y., Chen, X., Qin, T., Zhao, S., & Liu, T. (2019). FastSpeech: Fast, robust and controllable text to speech. arXiv. https://arxiv.org/abs/1905.09263
+
+Ren, Y., Hu, C., Tan, X., Qin, T., Zhao, S., Zhao, Z., & Liu, T. (2020). FastSpeech 2: Fast and high‑quality end‑to‑end text to speech. arXiv. https://arxiv.org/abs/2006.04558
+
+Shen, J., Pang, R., Weiss, R. J., Schuster, M., Jaitly, N., Yang, Z., … & Wu, Y. (2018). Natural TTS synthesis by conditioning WaveNet on mel spectrogram predictions. arXiv. https://arxiv.org/abs/1712.05884
+
+Thinh, L. (2024). viXTTS: A Vietnamese voice cloning text‑to‑speech model. GitHub. https://github.com/thinhlpg/vixtts-demo
+
+Vaswani, A., Shazeer, N., Parmar, N., Uszkoreit, J., Jones, L., Gomez, A. N., … & Polosukhin, I. (2017). Attention is all you need. arXiv. https://arxiv.org/abs/1706.03762
+
+Vu, T., Nguyen, L. T., & Nguyen, D. Q. (2025). Zero‑Shot Text‑to‑Speech for Vietnamese. arXiv. https://arxiv.org/abs/2506.01322
+
+Wan, L., Wang, Q., Papir, A., & Moreno, I. L. (2018). Generalized end‑to‑end loss for speaker verification. In 2018 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP) (pp. 4879–4883). IEEE. https://ieeexplore.ieee.org/abstract/document/8462665
+
+Wang, Y., Skerry‑Ryan, R. J., Stanton, D., Wu, Y., Weiss, R. J., Jaitly, N., … & Saurous, R. A. (2017). Tacotron: Towards end‑to‑end speech synthesis. arXiv. https://arxiv.org/abs/1703.10135
+
+Wang, Y., Stanton, D., Zhang, Y., Skerry‑Ryan, R. J., Battenberg, E., Shor, J., … & Saurous, R. A. (2018). Style tokens: Unsupervised style modeling, control and transfer in end‑to‑end speech synthesis. arXiv. https://arxiv.org/abs/1803.09017
+
+Yamagishi, J., Veaux, C., & MacDonald, K. (2019). CSTR VCTK Corpus: English multi‑speaker corpus for CSTR voice cloning toolkit (version 0.92). University of Edinburgh. https://datashare.ed.ac.uk/handle/10283/3443
+
+Zen, H., Dang, V., Clark, R., Zhang, Y., Weiss, R. J., Jia, Y., … & Wu, Y. (2019). LibriTTS: A corpus derived from LibriSpeech for text‑to‑speech. arXiv. https://arxiv.org/abs/1904.02822

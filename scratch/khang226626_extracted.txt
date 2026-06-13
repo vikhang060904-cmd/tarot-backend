@@ -1,0 +1,79 @@
+https://www.researchgate.net/publication/374344530_Text_to_Speech_Synthesis_Using_Deep_Learning
+
+ 2.https://ijfans.org/uploads/paper/8d8858e61392efb4ffdac959691591f6.pdf
+
+3. https://www.ijisrt.com/assets/upload/files/IJISRT25APR834.pdf
+
+4.https://www.clics-network.org/downloads/A%20Text-to-Speech%20System%20based%20on%20Deep%20Neural%20Networks_Dunaev.pdf
+
+5.https://ijaem.net/issue_dcp/A%20Comprehensive%20Review%20of%20Speech%20To%20Text%20Technologies%20%20Incorporating%20Translation%2C%20Summarization%2C%20And%20Beyond.pdf
+
+6.https://arxiv.org/abs/2106.15561
+
+7.https://arxiv.org/abs/2305.13905
+
+8. https://arxiv.org/abs/2409.03283
+
+9.https://arxiv.org/abs/2506.21619
+
+10. https://arxiv.org/abs/2507.21138
+
+11. https://www.isca-archive.org/interspeech_2025/kim25b_interspeech.pdf
+
+12. https://ijcrt.org/papers/IJCRT2507281.pdf
+
+13. https://arxiv.org/abs/2506.01322
+
+14.  https://ioit.vast.gov.vn/data/XFinder/files/News/LATS%20PhuongPN.pdf
+
+15.  https://www.narakeet.com/languages/text-to-speech-vietnamese-vi/
+
+16.https://www.researchgate.net/publication/389432469_Ung_Dung_Cong_Nghe_AI_Tao_cac_Video_Bai_Hoc_Sinh_Dong_Ho_Tro_Day_Tieng_Nhat
+
+17. https://fpt.ai/vi/bai-viet/huong-dan-chuy-van-ban-thanh-giong-doc-bang-fptai-voicemaker/
+
+18. https://www.everai.vn/text-to-speech
+
+19. https://www.jait.us/uploadfile/2022/0831/20220831054604906.pdf
+
+20. https://www.researchgate.net/publication/319406874_Text_-_To_-_Speech_Synthesis_TTS
+
+21. https://www.ijisrt.com/assets/upload/files/IJISRT25APR834.pdf
+
+22. https://www.cfilt.iitb.ac.in/resources/surveys/2022/shyam-tts-survey-29jun22.pdf
+
+23. https://asmp-eurasipjournals.springeropen.com/articles/10.1186/s13636-024-00329-7
+
+24. https://github.com/NTT123/Vietnamese-Text-To-Speech-Dataset
+
+25. https://huggingface.co/hynt/F5-TTS-Vietnamese-ViVoice
+
+26. https://github.com/liutaocode/TTS-arxiv-daily
+
+27. https://cloud.google.com/text-to-speech/docs/basics
+
+28.  https://github.com/tts-tutorial/survey
+
+29.https://www.semanticscholar.org/paper/A-Survey-on-Neural-Speech-Synthesis-Tan-Qin/4384ff4ac7459d3045ff660b1772c975512701d9
+
+30. https://tts-tutorial.github.io/interspeech2022/INTERSPEECH_Tutorial_TTS.pdf
+
+31.  https://github.com/tts-tutorial/survey
+
+32.  https://www.narakeet.com/languages/text-to-speech-vietnamese-vi
+
+33.  https://www.pdf2go.com/vi/text-to-speech
+
+34. https://www.cfilt.iitb.ac.in/resources/surveys/2022/shyam-tts-survey-29jun22.pdf
+
+35. https://viettelai.vn/chuyen-giong-noi
+
+36.  https://notegpt.io/text-to-speech
+
+37. https://ttsreader.com/
+
+38. https://elevenlabs.io/
+
+39. https://ttsfree.com/vn
+
+40. https://www.naturalreaders.com/online/

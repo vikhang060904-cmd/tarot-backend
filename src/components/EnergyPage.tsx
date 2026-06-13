@@ -1,6 +1,7 @@
   import { useEffect, useRef, useState } from "react";
   import PaymentModal from "./PaymentModal";
   import PaymentCheckPage from "./PaymentCheckPage";
+  import { useLang } from "../i18n/LanguageContext";
 
   interface EnergyPageProps {
     currentTokens: number;
@@ -32,13 +33,14 @@
     message?: string;
   };
 
-  const API_BASE = "http://127.0.0.1:8002";
+  const API_BASE = ""; // Dùng proxy để tương thích với Ngrok/Local
 
   const EnergyPage = ({
     currentTokens,
     userEmail,
     onPaymentSuccess,
   }: EnergyPageProps) => {
+    const { lang } = useLang();
     const [loadingCode, setLoadingCode] = useState<string | null>(null);
     const [order, setOrder] = useState<Order | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -49,39 +51,158 @@
     const [checkMatched, setCheckMatched] = useState<boolean | null>(null);
     const [isCheckingNow, setIsCheckingNow] = useState(false);
 
+    const [selectedPackage, setSelectedPackage] = useState<any | null>(null);
+    const [isMethodModalOpen, setIsMethodModalOpen] = useState(false);
+    const [isVnpayRedirecting, setIsVnpayRedirecting] = useState(false);
+
+    const [showSepay, setShowSepay] = useState(true);
+    const [showVnpay, setShowVnpay] = useState(true);
+
     const hasShownPaidAlertRef = useRef(false);
+
+    useEffect(() => {
+      const fetchConfig = async () => {
+        try {
+          const res = await fetch("/api/tarot/config");
+          const data = await res.json();
+          if (data && data.success) {
+            if (data.show_sepay !== undefined) setShowSepay(data.show_sepay);
+            if (data.show_vnpay !== undefined) setShowVnpay(data.show_vnpay);
+          }
+        } catch (err) {
+          console.error("Lỗi lấy cấu hình thanh toán:", err);
+        }
+      };
+      fetchConfig();
+    }, []);
+
+    const handleBuyClick = async (pkg: any) => {
+      setSelectedPackage(pkg);
+
+      // If neither is enabled
+      if (!showSepay && !showVnpay) {
+        alert(lang === 'vi' ? "🔮 Hệ thống nạp token hiện đang bảo trì. Vui lòng quay lại sau!" : "🔮 Token top-up system is under maintenance. Please try again later!");
+        return;
+      }
+
+      // If only VietQR is enabled
+      if (showSepay && !showVnpay) {
+        await createOrder(pkg.id);
+        return;
+      }
+
+      // If only VNPAY is enabled
+      if (!showSepay && showVnpay) {
+        try {
+          setIsVnpayRedirecting(true);
+          const email = (userEmail || "").trim().toLowerCase();
+          if (!email) {
+            throw new Error(lang === 'vi' ? "Không tìm thấy email người dùng." : "User email not found.");
+          }
+
+          const res = await fetch(`${API_BASE}/api/payments/create-vnpay-url`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              user_email: email,
+              package_code: pkg.id,
+            }),
+          });
+
+          const data = await parseJsonSafely<any>(res);
+          if (!res.ok || !data?.success) {
+            throw new Error(data?.detail || data?.error || (lang === 'vi' ? "Không tạo được liên kết VNPAY." : "Failed to create VNPAY link."));
+          }
+
+          window.location.href = data.payment_url;
+        } catch (error) {
+          console.error("VNPAY error:", error);
+          alert(getErrorMessage(error, lang === 'vi' ? "Lỗi kết nối Cổng VNPAY." : "VNPAY connection error."));
+        } finally {
+          setIsVnpayRedirecting(false);
+        }
+        return;
+      }
+
+      // If both are enabled, open method selection modal
+      setIsMethodModalOpen(true);
+    };
+
+    const handleSelectVietQr = async () => {
+      if (!selectedPackage) return;
+      setIsMethodModalOpen(false);
+      await createOrder(selectedPackage.id);
+    };
+
+    const handleSelectVnpay = async () => {
+      if (!selectedPackage) return;
+      try {
+        setIsVnpayRedirecting(true);
+        const email = (userEmail || "").trim().toLowerCase();
+        if (!email) {
+          throw new Error(lang === 'vi' ? "Không tìm thấy email người dùng." : "User email not found.");
+        }
+
+        const res = await fetch(`${API_BASE}/api/payments/create-vnpay-url`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            user_email: email,
+            package_code: selectedPackage.id,
+          }),
+        });
+
+        const data = await parseJsonSafely<any>(res);
+        if (!res.ok || !data?.success) {
+          throw new Error(data?.detail || data?.error || (lang === 'vi' ? "Không tạo được liên kết VNPAY." : "Failed to create VNPAY link."));
+        }
+
+        // Redirect to VNPay checkout
+        window.location.href = data.payment_url;
+      } catch (error) {
+        console.error("VNPAY error:", error);
+        alert(getErrorMessage(error, "Lỗi kết nối Cổng VNPAY."));
+      } finally {
+        setIsVnpayRedirecting(false);
+        setIsMethodModalOpen(false);
+      }
+    };
 
     const packages = [
       {
         id: "starter",
-        name: "Gói Khởi Đầu",
+        name: lang === 'vi' ? "Gói Khởi Đầu" : "Starter Pack",
         icon: "✨",
         tokens: 100,
-        description: "Phù hợp cho người mới bắt đầu hành trình Tarot.",
-        usages: "Khoảng 20 lần trải bài",
+        description: lang === 'vi' ? "Phù hợp cho người mới bắt đầu hành trình Tarot." : "Perfect for beginners starting their Tarot journey.",
+        usages: lang === 'vi' ? "Khoảng 20 lần trải bài" : "About 20 readings",
         price: "29.000đ",
-        bestFor: "Mới bắt đầu",
+        bestFor: lang === 'vi' ? "Mới bắt đầu" : "Getting started",
       },
       {
         id: "explorer",
-        name: "Gói Khám Phá",
+        name: lang === 'vi' ? "Gói Khám Phá" : "Explorer Pack",
         icon: "⚡",
         tokens: 500,
-        description: "Lựa chọn cân bằng giữa chi phí và trải nghiệm sử dụng.",
-        usages: "Khoảng 100 lần trải bài",
+        description: lang === 'vi' ? "Lựa chọn cân bằng giữa chi phí và trải nghiệm sử dụng." : "Balanced choice between cost and experience.",
+        usages: lang === 'vi' ? "Khoảng 100 lần trải bài" : "About 100 readings",
         price: "99.000đ",
-        bestFor: "Nên chọn",
+        bestFor: lang === 'vi' ? "Nên chọn" : "Recommended",
         recommended: true,
       },
       {
         id: "master",
-        name: "Gói Thạo Thủ",
+        name: lang === 'vi' ? "Gói Thạo Thủ" : "Master Pack",
         icon: "👑",
         tokens: 1500,
-        description: "Dành cho người dùng thường xuyên cần luận giải chuyên sâu.",
-        usages: "Khoảng 300 lần trải bài",
+        description: lang === 'vi' ? "Dành cho người dùng thường xuyên cần luận giải chuyên sâu." : "For frequent users needing deep insights.",
+        usages: lang === 'vi' ? "Khoảng 300 lần trải bài" : "About 300 readings",
         price: "249.000đ",
-        bestFor: "Giá tốt nhất",
+        bestFor: lang === 'vi' ? "Giá tốt nhất" : "Best value",
       },
     ];
 
@@ -136,7 +257,7 @@ const applyPaidSuccess = async (nextOrder: Order) => {
     // 🔥 FIX CHÍNH Ở ĐÂY
     try {
       const res = await fetch(
-        `http://127.0.0.1:8002/api/users/profile-summary?email=${userEmail}`
+        `/api/users/profile-summary?email=${encodeURIComponent(userEmail)}`
       );
       const user = await res.json();
 
@@ -151,7 +272,7 @@ const applyPaidSuccess = async (nextOrder: Order) => {
 
     setCheckMatched(true);
     setCheckMessage(
-      `✅ Thanh toán thành công. Bạn đã được cộng ${nextOrder.token_amount} token.`
+      `✅ ${lang === 'vi' ? 'Thanh toán thành công' : 'Payment successful'}. ${lang === 'vi' ? 'Bạn đã được cộng' : 'You received'} ${nextOrder.token_amount} token.`
     );
 
     setTimeout(() => {
@@ -169,7 +290,7 @@ const applyPaidSuccess = async (nextOrder: Order) => {
 
         const email = (userEmail || "").trim().toLowerCase();
         if (!email) {
-          throw new Error("Không tìm thấy email người dùng.");
+          throw new Error(lang === 'vi' ? "Không tìm thấy email người dùng." : "User email not found.");
         }
 
         const res = await fetch(`${API_BASE}/api/payments/create-order`, {
@@ -186,7 +307,7 @@ const applyPaidSuccess = async (nextOrder: Order) => {
         const data = await parseJsonSafely<Order>(res);
 
         if (!res.ok || !data?.success) {
-          throw new Error(data?.detail || data?.error || "Không tạo được đơn hàng.");
+          throw new Error(data?.detail || data?.error || (lang === 'vi' ? "Không tạo được đơn hàng." : "Failed to create order."));
         }
 
         const { success, ...orderData } = data;
@@ -196,36 +317,43 @@ const applyPaidSuccess = async (nextOrder: Order) => {
         setIsCheckPageOpen(false);
       } catch (error) {
         console.error("createOrder error:", error);
-        alert(getErrorMessage(error, "Lỗi tạo đơn hàng."));
+        alert(getErrorMessage(error, lang === 'vi' ? "Lỗi tạo đơn hàng." : "Error creating order."));
       } finally {
         setLoadingCode(null);
       }
     };
 
-    const refreshStatus = async (silent = false) => {
+    const refreshStatus = async (force = false) => {
       if (!order || isRefreshing) return;
 
       try {
         setIsRefreshing(true);
 
-        const res = await fetch(`${API_BASE}/api/payments/order/${order.id}`);
-        const data = await parseJsonSafely<Order>(res);
+        const endpoint = force 
+          ? `${API_BASE}/api/payments/check-order/${order.id}`
+          : `${API_BASE}/api/payments/order/${order.id}`;
+          
+        const res = await fetch(endpoint, { method: force ? 'POST' : 'GET' });
+        const data = await parseJsonSafely<any>(res);
 
         if (!res.ok || !data?.success) {
-          throw new Error(
-            data?.detail || data?.error || "Không kiểm tra được trạng thái thanh toán."
-          );
+          if (force) {
+             setCheckMessage(data?.detail || data?.error || (lang === 'vi' ? "Không tìm thấy giao dịch." : "Transaction not found."));
+             setCheckMatched(false);
+          }
+          return;
         }
 
-        const { success, ...orderData } = data;
-        const nextOrder = orderData as Order;
+        const nextOrder = data.order || data;
         mergeOrder(nextOrder);
         applyPaidSuccess(nextOrder);
+        
+        if (force && nextOrder.status === 'paid') {
+           setCheckMatched(true);
+           setCheckMessage("✅ Thanh toán thành công!");
+        }
       } catch (error) {
         console.error("refreshStatus error:", error);
-        if (!silent) {
-          alert(getErrorMessage(error, "Lỗi kiểm tra thanh toán."));
-        }
       } finally {
         setIsRefreshing(false);
       }
@@ -236,7 +364,7 @@ const applyPaidSuccess = async (nextOrder: Order) => {
 
     try {
       setIsCheckingNow(true);
-      setCheckMessage("Đang đối soát giao dịch, vui lòng đợi...");
+      setCheckMessage(lang === 'vi' ? "Đang đối soát giao dịch, vui lòng đợi..." : "Verifying transaction, please wait...");
       setCheckMatched(null);
 
       const res = await fetch(
@@ -256,7 +384,7 @@ const applyPaidSuccess = async (nextOrder: Order) => {
 
       if (!nextOrder) {
         setCheckMatched(false);
-        setCheckMessage("❌ Không tìm thấy đơn hàng.");
+        setCheckMessage(lang === 'vi' ? "❌ Không tìm thấy đơn hàng." : "❌ Order not found.");
         return;
       }
 
@@ -267,7 +395,7 @@ const applyPaidSuccess = async (nextOrder: Order) => {
 
         setCheckMatched(true);
         setCheckMessage(
-          data.message || "🎉 Thanh toán thành công!"
+          data.message || (lang === 'vi' ? "🎉 Thanh toán thành công!" : "🎉 Payment successful!")
         );
 
         setTimeout(() => {
@@ -276,13 +404,13 @@ const applyPaidSuccess = async (nextOrder: Order) => {
         }, 1500);
       } else {
         setCheckMatched(false);
-        setCheckMessage("❌ Chưa thanh toán.");
+        setCheckMessage(lang === 'vi' ? "❌ Chưa thanh toán." : "❌ Not paid yet.");
       }
 
     } catch (error) {
       console.error("handleCheckOrderNow error:", error);
       setCheckMatched(false);
-      setCheckMessage("❌ Lỗi kiểm tra thanh toán");
+      setCheckMessage(lang === 'vi' ? "❌ Lỗi kiểm tra thanh toán" : "❌ Payment check error");
     } finally {
       setIsCheckingNow(false);
     }
@@ -301,13 +429,13 @@ const applyPaidSuccess = async (nextOrder: Order) => {
     return (
       <div className="energy-page">
         <div className="page-header">
-          <h1>⚡ Triệu Hồi Năng Lượng</h1>
+          <h1>⚡ {lang === 'vi' ? 'Triệu Hồi Năng Lượng' : 'Summon Energy'}</h1>
           <p className="subtitle">
-            Nạp token để tiếp tục trải bài Tarot và khám phá hành trình vận mệnh của bạn
+            {lang === 'vi' ? 'Nạp token để tiếp tục trải bài Tarot và khám phá hành trình vận mệnh của bạn' : 'Recharge tokens to continue your Tarot journey and explore your destiny'}
           </p>
         </div>
 
-        <div className="current-token-box">Token hiện có: {currentTokens}</div>
+        <div className="current-token-box">{lang === 'vi' ? 'Token hiện có' : 'Current tokens'}: {currentTokens}</div>
 
         <div className="packages-grid">
           {packages.map((pkg) => (
@@ -316,7 +444,7 @@ const applyPaidSuccess = async (nextOrder: Order) => {
               className={`package-card ${pkg.recommended ? "recommended" : ""}`}
             >
               {pkg.recommended && (
-                <div className="recommended-badge">⭐ ĐƯỢC CHỌN NHIỀU</div>
+                <div className="recommended-badge">⭐ {lang === 'vi' ? 'ĐƯỢC CHỌN NHIỀU' : 'MOST POPULAR'}</div>
               )}
 
               <div className="package-icon">{pkg.icon}</div>
@@ -339,9 +467,9 @@ const applyPaidSuccess = async (nextOrder: Order) => {
                   type="button"
                   className="btn-buy"
                   disabled={loadingCode !== null}
-                  onClick={() => createOrder(pkg.id)}
+                  onClick={() => handleBuyClick(pkg)}
                 >
-                  {loadingCode === pkg.id ? "Đang tạo QR..." : "💰 Nạp Ngay"}
+                  {loadingCode === pkg.id ? (lang === 'vi' ? "Đang tạo QR..." : "Creating QR...") : (lang === 'vi' ? "💰 Nạp Ngay" : "💰 Buy Now")}
                 </button>
               </div>
             </div>
@@ -349,11 +477,15 @@ const applyPaidSuccess = async (nextOrder: Order) => {
         </div>
 
         <PaymentModal
-    isOpen={isModalOpen}
-    onClose={() => setIsModalOpen(false)}
-    order={order}
-    onRefreshStatus={refreshStatus} // ✅ ĐÚNG
-  />
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          order={order}
+          onRefreshStatus={refreshStatus}
+          onOpenCheck={() => {
+            setIsModalOpen(false);
+            setIsCheckPageOpen(true);
+          }}
+        />
 
         <PaymentCheckPage
           isOpen={isCheckPageOpen}
@@ -367,9 +499,127 @@ const applyPaidSuccess = async (nextOrder: Order) => {
           }}
           onClose={() => setIsCheckPageOpen(false)}
           onCheckNow={handleCheckOrderNow}
-          
         />
+
+        {/* PAYMENT METHOD SELECTION MODAL */}
+        {isMethodModalOpen && selectedPackage && (
+          <div className="payment-overlay" onClick={() => setIsMethodModalOpen(false)}>
+            <div className="payment-modal method-modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: "500px", padding: "30px" }}>
+              <button type="button" className="payment-close" onClick={() => setIsMethodModalOpen(false)}>×</button>
+              
+              <h2 className="payment-title" style={{ fontFamily: "Times New Roman", fontSize: "1.8rem" }}>{lang === 'vi' ? 'Chọn Phương Thức' : 'Choose Method'}</h2>
+              <p className="payment-quote" style={{ marginBottom: "25px", color: "var(--gold)", fontSize: "0.95rem" }}>
+                {lang === 'vi' ? 'Gói đã chọn' : 'Selected package'}: {selectedPackage.name} ({selectedPackage.tokens} Tokens) — {selectedPackage.price}
+              </p>
+
+              <div className="payment-methods-list" style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
+                
+                {/* Method 1: VietQR */}
+                {showSepay && (
+                  <div 
+                    className="payment-method-item" 
+                    onClick={handleSelectVietQr}
+                    style={{
+                      border: "1px solid rgba(197, 160, 89, 0.4)",
+                      borderRadius: "12px",
+                      padding: "16px 20px",
+                      background: "rgba(26, 21, 14, 0.85)",
+                      cursor: "pointer",
+                      transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "18px",
+                      boxShadow: "0 4px 15px rgba(0,0,0,0.3)"
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.borderColor = "var(--gold)";
+                      e.currentTarget.style.transform = "translateY(-2px)";
+                      e.currentTarget.style.background = "rgba(197, 160, 89, 0.15)";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.borderColor = "rgba(197, 160, 89, 0.4)";
+                      e.currentTarget.style.transform = "translateY(0)";
+                      e.currentTarget.style.background = "rgba(26, 21, 14, 0.85)";
+                    }}
+                  >
+                    <div style={{ fontSize: "2.2rem", filter: "drop-shadow(0 0 8px var(--gold))" }}>📲</div>
+                    <div style={{ flex: 1, textAlign: "left" }}>
+                      <div style={{ fontWeight: "bold", fontSize: "1.1rem", color: "var(--gold)", fontFamily: "Times New Roman" }}>
+                        {lang === 'vi' ? 'Chuyển Khoản VietQR (SePay)' : 'VietQR Transfer (SePay)'}
+                      </div>
+                      <div style={{ fontSize: "0.82rem", opacity: 0.8, marginTop: "4px", lineHeight: "1.4" }}>
+                        {lang === 'vi' ? 'Quét mã QR tự động từ ứng dụng Ngân hàng. Kích hoạt cực nhanh trong 30 giây.' : 'Scan auto QR from Banking app. Activated in 30 seconds.'}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Method 2: VNPAY */}
+                {showVnpay && (
+                  <div 
+                    className="payment-method-item" 
+                    onClick={handleSelectVnpay}
+                    style={{
+                      border: "1px solid rgba(197, 160, 89, 0.4)",
+                      borderRadius: "12px",
+                      padding: "16px 20px",
+                      background: "rgba(26, 21, 14, 0.85)",
+                      cursor: "pointer",
+                      transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "18px",
+                      boxShadow: "0 4px 15px rgba(0,0,0,0.3)"
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.borderColor = "#3197f9";
+                      e.currentTarget.style.transform = "translateY(-2px)";
+                      e.currentTarget.style.background = "rgba(49, 151, 249, 0.15)";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.borderColor = "rgba(197, 160, 89, 0.4)";
+                      e.currentTarget.style.transform = "translateY(0)";
+                      e.currentTarget.style.background = "rgba(26, 21, 14, 0.85)";
+                    }}
+                  >
+                    <div style={{ fontSize: "2.2rem", filter: "drop-shadow(0 0 8px #3197f9)" }}>💳</div>
+                    <div style={{ flex: 1, textAlign: "left" }}>
+                      <div style={{ fontWeight: "bold", fontSize: "1.1rem", color: "#3197f9", fontFamily: "Times New Roman", display: "flex", alignItems: "center", gap: "8px" }}>
+                        {lang === 'vi' ? 'Cổng Thanh Toán VNPAY' : 'VNPAY Payment Gateway'} <span style={{ background: "#3197f9", color: "white", fontSize: "0.6rem", padding: "2px 6px", borderRadius: "4px", textTransform: "uppercase", fontWeight: "bold" }}>{lang === 'vi' ? 'Mới' : 'New'}</span>
+                      </div>
+                      <div style={{ fontSize: "0.82rem", opacity: 0.8, marginTop: "4px", lineHeight: "1.4" }}>
+                        {lang === 'vi' ? 'Thanh toán thẻ ATM Nội địa, Visa, Mastercard, JCB hoặc ứng dụng Ví VNPAY.' : 'Pay with ATM, Visa, Mastercard, JCB or VNPAY Wallet.'}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+              </div>
+
+              {isVnpayRedirecting && (
+                <div style={{ marginTop: "20px", color: "#3197f9", fontSize: "0.9rem", display: "flex", alignItems: "center", justifyContent: "center", gap: "10px" }}>
+                  <span className="vnpay-spinner" style={{
+                    width: "16px",
+                    height: "16px",
+                    border: "2px solid #3197f9",
+                    borderTopColor: "transparent",
+                    borderRadius: "50%",
+                    display: "inline-block",
+                    animation: "spin 1s linear infinite"
+                  }}></span>
+                  {lang === 'vi' ? 'Đang chuyển hướng tới cổng VNPAY...' : 'Redirecting to VNPAY...'}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
         
+        <style>{`
+          @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
+        `}</style>
 
       </div>
     );

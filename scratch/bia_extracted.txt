@@ -1,0 +1,313 @@
+TRƯỜNG ĐẠI HỌC NAM CẦN THƠ 
+
+KHOA CÔNG NGHỆ THÔNG TIN 
+
+Lớp: DH22TIN07
+
+NGUYỄN VĨ KHANG - 226626
+
+ĐỀ TÀI:
+
+Tổng Quan Các Hệ Thống Chuyển Văn Bản Thành Giọng Nói Dựa Trên Trí Tuệ Nhân Tạo
+
+Ngành Công Nghệ Thông Tin 
+
+Mã số ngành: 7480201
+
+TRƯỜNG ĐẠI HỌC NAM CẦN THƠ
+
+KHOA CÔNG NGHỆ THÔNG TIN
+
+ĐỀ TÀI:
+
+Tổng Quan Các Hệ Thống Chuyển Văn Bản Thành Giọng Nói Dựa Trên Trí Tuệ Nhân Tạo
+
+Báo Cáo Cuối Môn Phương Pháp Nghiên Cứu 
+
+Và Viết Báo Cáo Khoa Học
+
+Giảng Viên:TS. Ngô Hồ Anh Khôi
+
+Nghành Công Nghệ Thông Tin
+
+Mã số ngành: 7480201 
+
+LỜI CẢM ƠN
+
+Với lòng biết ơn sâu sắc và tình cảm chân thành cho phép chúng em gửi lời cảm ơn chân thành nhất tới:
+
+Trường Đại học Nam Cần Thơ, khoa Công Nghệ Thông Tin, cùng các giảng viên đã tận tình chỉ dạy và tạo điều kiện giúp đỡ chúng em trong quá trình học tập, nghiên cứu và hoàn thành đề tài.
+
+Đặc biệt chúng em xin bày tỏ lòng biết ơn sâu sắc đến TS. Ngô Hồ Anh Khôi - người hướng dẫn và cũng là người đã hướng dẫn, chỉ bảo, giúp đỡ em trong suốt quá trình nghiên cứu và hoàn thành đề tài nghiên cứu này.
+
+Mặc dù, đã cố gắng rất nhiều nhưng bài luận không tránh khỏi những thiếu sót; chúng em rất mong nhận được sự thông cảm, chỉ dẫn, giúp đỡ và đóng góp ý kiến của quý thầy cô, các cán bộ quản lý và các bạn đang học cùng chúng em tại Trường Đại học Nam Cần Thơ.
+
+NHẬN XÉT GIẢNG VIÊN
+
+Cần Thơ, ngày….tháng…. năm 20…
+
+ Giảng viên
+
+                                                                               TS. Ngô Hồ Anh Khôi
+
+MỤC LỤC
+
+TÓM TẮT-Công nghệ chuyển văn bản thành giọng nói (Text-to-Speech – TTS) là một lĩnh vực quan trọng trong trí tuệ nhân tạo và xử lý tiếng nói, có vai trò then chốt trong việc phát triển các hệ thống tương tác người – máy trong bối cảnh chuyển đổi số hiện nay. Nghiên cứu tổng hợp này được thực hiện nhằm hệ thống hóa các sản phẩm, mã nguồn, bộ dữ liệu, phương pháp nghiên cứu và chỉ số đánh giá tiêu biểu trong lĩnh vực Text-to-Speech. Phương pháp nghiên cứu chủ yếu được sử dụng là tổng hợp, phân tích và so sánh các công trình khoa học, hệ thống mã nguồn mở và sản phẩm thương mại được công bố trong khoảng mười năm trở lại đây. Kết quả nghiên cứu cho thấy sự phát triển mạnh mẽ của các hệ thống TTS hiện đại dựa trên học sâu, với chất lượng giọng nói ngày càng tự nhiên và khả năng ứng dụng ngày càng rộng rãi. Bài nghiên cứu được cấu trúc theo các cụm vấn đề chính bao gồm sản phẩm, mã nguồn và công cụ, dữ liệu, hướng nghiên cứu khoa học và phương pháp đánh giá, từ đó làm rõ bức tranh tổng thể của lĩnh vực Text-to-Speech.
+
+Từ khóa-Text-to-Speech, Tổng hợp giọng nói, Trí tuệ nhân tạo, Học sâu, Xử lý tiếng nói
+
+GIỚI THIỆU.
+
+Trong những năm gần đây, công nghệ chuyển văn bản thành giọng nói (Text-to-Speech – TTS) đã trở thành một trong những hướng nghiên cứu và ứng dụng quan trọng của trí tuệ nhân tạo và xử lý tiếng nói. Sự phát triển mạnh mẽ của các hệ thống tương tác người – máy, cùng với nhu cầu ngày càng cao về tự động hóa và cá nhân hóa dịch vụ, đã thúc đẩy việc ứng dụng TTS trong nhiều lĩnh vực khác nhau như trợ lý ảo, tổng đài tự động, giáo dục trực tuyến, sách nói và các hệ thống hỗ trợ người khiếm thị. Trong bối cảnh chuyển đổi số toàn cầu, TTS không chỉ đóng vai trò là công nghệ hỗ trợ mà còn trở thành một thành phần cốt lõi trong các hệ sinh thái số hiện đại (Tan et al., 2021).Về mặt khái niệm, Text-to-Speech là quá trình chuyển đổi nội dung văn bản sang tín hiệu giọng nói có thể nghe được, với yêu cầu quan trọng là giọng nói đầu ra phải tự nhiên, rõ ràng và dễ hiểu. Một hệ thống TTS hoàn chỉnh thường bao gồm nhiều thành phần như xử lý văn bản, trích xuất đặc trưng ngữ âm, mô hình hóa âm học và sinh sóng âm. Mục tiêu của các hệ thống TTS hiện đại không chỉ dừng lại ở việc phát âm chính xác mà còn hướng tới việc thể hiện ngữ điệu, nhịp điệu và cảm xúc tương tự như giọng nói con người (Shen et al., 2018).Lý do lựa chọn đề tài nghiên cứu tổng hợp về Text-to-Speech xuất phát từ sự phát triển nhanh chóng và đa dạng của lĩnh vực này trong thời gian gần đây.
+
+ Sự xuất hiện liên tục của các mô hình học sâu mới, các hệ thống mã nguồn mở và các sản phẩm thương mại đã tạo ra một lượng lớn tài liệu, công trình nghiên cứu và giải pháp ứng dụng. Tuy nhiên, các thông tin này thường phân tán, khó tiếp cận một cách hệ thống, đặc biệt đối với người mới bắt đầu nghiên cứu hoặc triển khai TTS. Do đó, việc thực hiện một nghiên cứu tổng hợp nhằm hệ thống hóa các sản phẩm, mã nguồn, bộ dữ liệu, phương pháp nghiên cứu và chỉ số đánh giá là cần thiết, góp phần cung cấp cái nhìn toàn diện về lĩnh vực Text-to-Speech.Mục tiêu của nghiên cứu này là tổng hợp và phân tích các thành phần chính của lĩnh vực Text-to-Speech trong khoảng mười năm trở lại đây, bao gồm các hệ thống và sản phẩm tiêu biểu, các nền tảng mã nguồn và công cụ hỗ trợ, các bộ dữ liệu thường được sử dụng, các hướng nghiên cứu khoa học chủ đạo cũng như các chỉ số đánh giá hiệu quả hệ thống. Thông qua việc tổng hợp và phân tích các tài liệu nghiên cứu và nguồn thông tin đáng tin cậy, nghiên cứu hướng đến việc làm rõ bức tranh tổng thể của công nghệ TTS, đồng thời chỉ ra những xu hướng phát triển và thách thức còn tồn tại.Phương pháp nghiên cứu được sử dụng trong bài viết này chủ yếu là phương pháp tổng hợp thông tin và phân tích tài liệu. Các tài liệu khoa học, bài báo hội nghị, tạp chí chuyên ngành, tài liệu kỹ thuật và nguồn thông tin chính thức từ các hệ thống mã nguồn mở và sản phẩm thương mại được thu thập, chọn lọc và phân tích. Các nội dung được hệ thống hóa theo phương pháp cụm vấn đề, nhằm đảm bảo tính logic, tính độc lập tương đối giữa các phần và khả năng bao quát toàn diện chủ đề nghiên cứu.
+
+Về phạm vi nghiên cứu, bài viết tập trung vào các hệ thống Text-to-Speech dựa trên học sâu, vốn đang chiếm ưu thế trong nghiên cứu và ứng dụng hiện nay. Các phương pháp truyền thống dựa trên luật hoặc ghép nối tín hiệu chỉ được đề cập ở mức khái quát nhằm làm rõ bối cảnh phát triển. Ngoài ra, nghiên cứu không đi sâu vào chi tiết cài đặt hoặc thiết kế phần mềm cụ thể, mà tập trung vào việc tổng hợp và phân tích các xu hướng, phương pháp và thành phần cốt lõi của công nghệ TTS.Về cấu trúc, bài nghiên cứu được tổ chức theo các cụm vấn đề chính. Sau phần giới thiệu, phần lịch sử đề tài và các nghiên cứu liên quan trình bày tiến trình phát triển và các công trình tiêu biểu trong lĩnh vực Text-to-Speech. Phần nội dung chính tập trung phân tích các cụm vấn đề bao gồm sản phẩm và hệ thống, mã nguồn và công cụ, dữ liệu, công nghệ và giải thuật, cũng như chỉ số đánh giá. Cuối cùng, phần kết luận tổng hợp lại các nội dung chính và gợi mở các hướng nghiên cứu trong tương lai. Cách bố cục này nhằm đảm bảo tính mạch lạc và phù hợp với đặc thù của một bài nghiên cứu tổng hợp thông tin.
+
+II.SẢN PHẨM VÀ HỆ THỐNG.
+
+Công nghệ chuyển văn bản thành giọng nói (Text-to-Speech – TTS) đã phát triển mạnh mẽ cùng với sự tiến bộ của trí tuệ nhân tạo và học sâu, trở thành một thành phần quan trọng trong các hệ thống tương tác người – máy hiện đại. Từ các phương pháp tổng hợp giọng nói dựa trên quy tắc và ghép nối tín hiệu, các hệ thống TTS ngày nay đã chuyển sang các mô hình học sâu có khả năng tạo ra giọng nói tự nhiên, mượt mà và giàu biểu cảm. Quá trình phát triển này đã hình thành nên một hệ sinh thái sản phẩm đa dạng, bao gồm các hệ thống mã nguồn mở phục vụ nghiên cứu và các sản phẩm thương mại được triển khai rộng rãi trong thực tế (Tan et al., 2021).
+
+Trên nền tảng đó, Coqui TTS được xem là một trong những hệ thống mã nguồn mở tiêu biểu, đóng vai trò quan trọng trong nghiên cứu và thử nghiệm công nghệ tổng hợp giọng nói. Hệ thống này cung cấp đầy đủ các thành phần của một pipeline TTS hiện đại, cho phép tiếp cận trực tiếp với mô hình học sâu, quy trình huấn luyện và các kỹ thuật xử lý tiếng nói. Nhờ tính linh hoạt và khả năng mở rộng cao, Coqui TTS đã trở thành môi trường thử nghiệm hiệu quả cho việc phát triển và cải tiến các phương pháp tổng hợp giọng nói mới (Coqui AI, 2023).
+
+Từ vai trò nền tảng nghiên cứu đó, Mozilla TTS tiếp tục mở rộng hệ sinh thái TTS theo hướng minh bạch và dễ tiếp cận cho cộng đồng học thuật. Dự án này không chỉ cung cấp mã nguồn cho các mô hình tổng hợp giọng nói hiện đại mà còn góp phần chuẩn hóa quy trình nghiên cứu và chia sẻ tri thức trong lĩnh vực xử lý tiếng nói. Việc hỗ trợ nhiều kiến trúc mô hình và ngôn ngữ khác nhau giúp Mozilla TTS trở thành cầu nối quan trọng giữa nghiên cứu học thuật và các ứng dụng thực nghiệm (Mozilla, 2020).
+
+Bên cạnh các hệ thống mã nguồn mở tổng quát, ESPnet-TTS đại diện cho hướng tiếp cận nghiên cứu chuyên sâu trong lĩnh vực xử lý tiếng nói end-to-end. Là một phần của bộ công cụ ESPnet, hệ thống này cung cấp môi trường thống nhất để huấn luyện, đánh giá và so sánh các mô hình TTS hiện đại. ESPnet-TTS đóng vai trò quan trọng trong việc kết nối các nghiên cứu lý thuyết với triển khai thực tế, đồng thời góp phần thúc đẩy sự phát triển có hệ thống của các phương pháp tổng hợp giọng nói.
+
+Trên cơ sở các nền tảng mã nguồn mở đó, nhiều mô hình TTS cốt lõi đã được đề xuất nhằm giải quyết các hạn chế về tốc độ và độ ổn định trong tổng hợp giọng nói. FastSpeech là một mô hình tiêu biểu, tập trung vào việc tối ưu hóa quá trình suy luận thông qua kiến trúc Transformer và cơ chế dự đoán độ dài, giúp tăng tốc độ tổng hợp và cải thiện tính ổn định của hệ thống (Ren et al., 2019). Mô hình này đặc biệt phù hợp với các ứng dụng yêu cầu xử lý thời gian thực.
+
+Tiếp nối FastSpeech, FastSpeech2 mở rộng khả năng kiểm soát các yếu tố ngữ điệu như cao độ, nhịp điệu và cường độ, từ đó nâng cao đáng kể độ tự nhiên của giọng nói tổng hợp. Sự phát triển của FastSpeech2 cho thấy xu hướng hoàn thiện các mô hình TTS theo hướng cân bằng giữa hiệu năng tính toán và chất lượng âm thanh, tạo nền tảng cho việc triển khai trong các hệ thống quy mô lớn.
+
+Ở một hướng tiếp cận khác, VITS đại diện cho xu hướng end-to-end trong nghiên cứu TTS hiện đại. Mô hình này kết hợp các kỹ thuật học sâu tiên tiến trong một kiến trúc thống nhất, cho phép huấn luyện đồng thời mô hình âm học và vocoder. Nhờ đó, VITS đạt được chất lượng giọng nói tự nhiên cao và được xem là nền tảng cho nhiều hệ thống TTS thế hệ mới (Kim et al., 2021).
+
+Từ các mô hình nghiên cứu cốt lõi, công nghệ TTS đã được thương mại hóa và triển khai rộng rãi thông qua các nền tảng điện toán đám mây. Google Cloud Text-to-Speech là một sản phẩm tiêu biểu, cung cấp dịch vụ tổng hợp giọng nói dựa trên các mô hình học sâu tiên tiến và hỗ trợ nhiều ngôn ngữ khác nhau. Hệ thống này cho phép tích hợp linh hoạt vào các ứng dụng thông qua API và được sử dụng rộng rãi trong trợ lý ảo, tổng đài tự động và các hệ thống đọc nội dung số (Google, 2023).
+
+Bên cạnh đó, Amazon Polly và Microsoft Azure Speech Service là những sản phẩm thương mại quan trọng khác, phản ánh xu hướng triển khai TTS ở quy mô công nghiệp. Amazon Polly tập trung vào khả năng tổng hợp giọng nói theo thời gian thực với nhiều phong cách đọc khác nhau, trong khi Azure Speech Service cung cấp công nghệ Neural Voice với khả năng tùy chỉnh giọng nói theo yêu cầu doanh nghiệp. Các sản phẩm này cho thấy mức độ trưởng thành và khả năng ứng dụng rộng rãi của công nghệ TTS trong môi trường thương mại (Amazon Web Services, 2023; Microsoft, 2023).
+
+Trong bối cảnh bản địa hóa công nghệ, các hệ thống TTS tại Việt Nam như FPT.AI và Viettel AI đã được phát triển nhằm đáp ứng đặc thù ngôn ngữ và ngữ điệu tiếng Việt. Những sản phẩm này tập trung tối ưu hóa giọng nói theo vùng miền và bối cảnh sử dụng thực tế, đồng thời được triển khai trong các lĩnh vực như ngân hàng số, chính phủ điện tử và chăm sóc khách hàng tự động. Sự xuất hiện của các hệ thống TTS nội địa cho thấy tiềm năng phát triển và ứng dụng bền vững của công nghệ tổng hợp giọng nói tại Việt Nam (FPT, 2023; Viettel AI, 2023).
+
+Nhìn chung, các sản phẩm và hệ thống Text-to-Speech hiện nay hình thành nên một chuỗi phát triển liên tục, từ nền tảng nghiên cứu mã nguồn mở, các mô hình cốt lõi đến các sản phẩm thương mại và giải pháp bản địa hóa. Mỗi sản phẩm đảm nhiệm một vai trò riêng nhưng có mối liên kết chặt chẽ về mặt công nghệ và mục tiêu phát triển, phản ánh rõ tiến trình phát triển toàn diện của lĩnh vực Text-to-Speech trong bối cảnh hiện nay.
+
+III. MÃ NGUỒN – CÔNG CỤ – THƯ VIỆN (SOURCE CODE / FRAMEWORKS).
+
+Trong bối cảnh phát triển nhanh chóng của công nghệ thông tin và trí tuệ nhân tạo, mã nguồn, công cụ và thư viện đóng vai trò then chốt trong toàn bộ vòng đời nghiên cứu và phát triển hệ thống. Đối với các bài nghiên cứu tổng hợp, việc phân tích và hệ thống hóa các mã nguồn, framework và thư viện liên quan không chỉ giúp làm rõ nền tảng kỹ thuật của lĩnh vực mà còn phản ánh mức độ trưởng thành và khả năng ứng dụng thực tiễn của các công nghệ đang được nghiên cứu. Đây là một trong những thành phần quan trọng nhằm kết nối giữa nghiên cứu học thuật và triển khai thực tế.
+
+Mã nguồn mở (open-source) giữ vị trí trung tâm trong hệ sinh thái phát triển công nghệ hiện đại. Việc công khai mã nguồn cho phép cộng đồng nghiên cứu và phát triển tiếp cận trực tiếp với các thuật toán, cấu trúc hệ thống và quy trình xử lý, từ đó có thể kiểm chứng, tái hiện và cải tiến các kết quả nghiên cứu đã được công bố. Trong môi trường nghiên cứu khoa học, mã nguồn mở góp phần nâng cao tính minh bạch, giảm thiểu sự phụ thuộc vào các giải pháp độc quyền và tạo điều kiện thuận lợi cho việc so sánh, đánh giá giữa các phương pháp khác nhau. Nhờ đó, các kết quả nghiên cứu không chỉ dừng lại ở mức lý thuyết mà còn có khả năng được kiểm nghiệm và ứng dụng trong nhiều bối cảnh khác nhau.
+
+Bên cạnh vai trò học thuật, mã nguồn mở còn mang ý nghĩa thực tiễn sâu sắc trong việc rút ngắn thời gian và chi phí phát triển hệ thống. Thay vì xây dựng toàn bộ hệ thống từ đầu, các nhà nghiên cứu và lập trình viên có thể kế thừa và mở rộng các dự án mã nguồn đã tồn tại. Điều này đặc biệt quan trọng đối với các đề tài có phạm vi nghiên cứu rộng hoặc yêu cầu kỹ thuật phức tạp, nơi mà việc tái sử dụng mã nguồn giúp tập trung nguồn lực vào cải tiến thuật toán và nâng cao hiệu quả hệ thống thay vì giải quyết lại các vấn đề nền tảng.
+
+Song song với mã nguồn, các framework và nền tảng phát triển đóng vai trò như bộ khung kỹ thuật, giúp chuẩn hóa quy trình xây dựng và triển khai hệ thống. Framework thường cung cấp sẵn các mô-đun chức năng, cấu trúc tổ chức mã nguồn và cơ chế quản lý tài nguyên, qua đó giúp giảm độ phức tạp trong quá trình phát triển. Việc sử dụng framework phù hợp giúp tăng tính nhất quán của hệ thống, hỗ trợ kiểm soát lỗi và cải thiện khả năng bảo trì trong dài hạn. Đối với các nghiên cứu mang tính tổng hợp, việc phân tích các framework phổ biến trong lĩnh vực còn giúp làm rõ xu hướng công nghệ và các phương pháp tiếp cận được cộng đồng chấp nhận rộng rãi.
+
+Ngoài ra, framework còn đóng vai trò cầu nối giữa nghiên cứu và triển khai thực tế. Nhiều framework được thiết kế nhằm hỗ trợ cả giai đoạn thử nghiệm trong phòng thí nghiệm lẫn triển khai trên môi trường sản xuất. Nhờ đó, các mô hình hoặc thuật toán được đề xuất trong nghiên cứu có thể dễ dàng được tích hợp vào các hệ thống ứng dụng thực tế. Điều này góp phần nâng cao giá trị ứng dụng của nghiên cứu, đồng thời phản ánh khả năng mở rộng và tính khả thi của các giải pháp kỹ thuật được đề xuất.
+
+Thư viện (library) là thành phần không thể thiếu trong quá trình phát triển hệ thống, đặc biệt đối với các lĩnh vực đòi hỏi xử lý dữ liệu phức tạp hoặc tính toán chuyên sâu. Thư viện thường cung cấp các hàm, lớp và công cụ phục vụ cho những tác vụ cụ thể như xử lý dữ liệu, phân tích tín hiệu, học máy, trực quan hóa kết quả hoặc tối ưu hiệu năng. Việc sử dụng thư viện giúp giảm đáng kể khối lượng công việc lập trình, đồng thời hạn chế sai sót trong các phép tính và quy trình xử lý. Đối với nghiên cứu khoa học, thư viện còn giúp đảm bảo tính nhất quán và độ chính xác của các kết quả thực nghiệm.
+
+Một khía cạnh quan trọng khác của thư viện là khả năng chuẩn hóa phương pháp tiếp cận trong cộng đồng nghiên cứu. Khi nhiều công trình sử dụng chung một số thư viện tiêu chuẩn, việc so sánh và đánh giá kết quả giữa các nghiên cứu trở nên thuận lợi hơn. Điều này đặc biệt có ý nghĩa trong các nghiên cứu tổng hợp, nơi mà mục tiêu không chỉ là trình bày từng giải pháp riêng lẻ mà còn là phân tích, đối chiếu và rút ra xu hướng chung của toàn lĩnh vực.
+
+Bên cạnh mã nguồn, framework và thư viện, các công cụ hỗ trợ phát triển và triển khai hệ thống cũng đóng vai trò quan trọng trong hệ sinh thái kỹ thuật. Các công cụ này có thể bao gồm môi trường phát triển tích hợp, công cụ quản lý phiên bản, công cụ kiểm thử và công cụ tối ưu hóa hiệu năng. Việc sử dụng các công cụ phù hợp giúp nâng cao hiệu quả làm việc, hỗ trợ kiểm soát chất lượng và đảm bảo tính ổn định của hệ thống trong suốt quá trình phát triển. Đối với các đề tài nghiên cứu mang tính tổng hợp, việc đề cập đến vai trò của các công cụ này giúp làm rõ bức tranh toàn diện về quy trình phát triển công nghệ trong lĩnh vực nghiên cứu.
+
+Trong bối cảnh triển khai ứng dụng thực tế, hệ sinh thái mã nguồn, công cụ và thư viện còn ảnh hưởng trực tiếp đến khả năng mở rộng và tích hợp của hệ thống. Một hệ thống được xây dựng dựa trên các nền tảng và thư viện phổ biến thường có khả năng tích hợp tốt hơn với các hệ thống khác, đồng thời dễ dàng thích nghi với những thay đổi về yêu cầu kỹ thuật hoặc môi trường vận hành. Điều này đặc biệt quan trọng đối với các hệ thống được triển khai trong môi trường doanh nghiệp hoặc quy mô lớn, nơi mà tính linh hoạt và khả năng mở rộng là những tiêu chí hàng đầu.
+
+Tổng hợp lại, mã nguồn, công cụ và thư viện không chỉ là các thành phần kỹ thuật đơn lẻ mà còn tạo thành một hệ sinh thái hoàn chỉnh, quyết định trực tiếp đến chất lượng, hiệu quả và khả năng ứng dụng của hệ thống. Trong nghiên cứu khoa học dạng tổng hợp, việc phân tích và hệ thống hóa các yếu tố này giúp làm rõ nền tảng kỹ thuật của lĩnh vực, đồng thời cung cấp cái nhìn toàn diện về các phương pháp tiếp cận và xu hướng phát triển. Sự kết hợp hài hòa giữa mã nguồn mở, framework phù hợp và các thư viện chuyên dụng chính là tiền đề quan trọng để các nghiên cứu không chỉ đạt giá trị học thuật mà còn có khả năng triển khai và ứng dụng bền vững trong thực tiễn.
+
+IV. DỮ LIỆU (DATASETS / BENCHMARKS)
+
+Qua đó trong các hệ thống Text-to-Speech hiện đại, dữ liệu đóng vai trò trung tâm và có ảnh hưởng trực tiếp đến chất lượng giọng nói tổng hợp. Khác với nhiều bài toán trí tuệ nhân tạo khác, TTS yêu cầu dữ liệu song song bao gồm văn bản và tín hiệu âm thanh tương ứng, trong đó mỗi câu văn bản phải được gắn chính xác với đoạn giọng nói tương ứng. Chất lượng, quy mô và tính đa dạng của dữ liệu quyết định khả năng học của mô hình, mức độ tự nhiên của giọng nói và khả năng tổng quát hóa sang các ngữ cảnh mới. Do đó, dữ liệu không chỉ là yếu tố đầu vào mà còn là nền tảng cốt lõi cho toàn bộ quá trình nghiên cứu và phát triển hệ thống TTS (Tan et al., 2021).Các bộ dữ liệu được sử dụng trong nghiên cứu Text-to-Speech thường được xây dựng theo những tiêu chuẩn nghiêm ngặt về chất lượng âm thanh và nội dung ngôn ngữ. Âm thanh cần được thu ở môi trường yên tĩnh, hạn chế nhiễu, có tần số lấy mẫu ổn định và độ phân giải phù hợp. Văn bản đi kèm phải được chuẩn hóa, loại bỏ lỗi chính tả và thể hiện đúng ngữ cảnh phát âm. Việc đảm bảo sự đồng bộ giữa văn bản và âm thanh là điều kiện tiên quyết để mô hình học được mối quan hệ giữa ngôn ngữ viết và ngôn ngữ nói. Nếu dữ liệu không đạt chất lượng, mô hình TTS dù có kiến trúc phức tạp cũng khó đạt được kết quả tốt (Shen et al., 2018).Trong cộng đồng nghiên cứu, một số bộ dữ liệu chuẩn đã được sử dụng rộng rãi như các benchmark nhằm đánh giá và so sánh các phương pháp TTS khác nhau. LJSpeech Dataset là một trong những bộ dữ liệu phổ biến nhất, bao gồm hơn 13.000 câu tiếng Anh được đọc bởi một giọng nữ duy nhất với chất lượng âm thanh cao. Bộ dữ liệu này thường được sử dụng trong các nghiên cứu ban đầu nhằm đánh giá khả năng tổng hợp giọng nói của mô hình trong điều kiện dữ liệu đơn giọng và nội dung tương đối đồng nhất (Ito, 2017). Nhờ tính đơn giản và dễ tiếp cận, LJSpeech đã trở thành benchmark quan trọng trong nhiều công trình nghiên cứu TTS.
+
+Bên cạnh các bộ dữ liệu đơn giọng, các bộ dữ liệu đa giọng cũng đóng vai trò quan trọng trong việc phát triển các hệ thống TTS linh hoạt và có khả năng tổng quát hóa cao. VCTK Corpus là một ví dụ tiêu biểu, bao gồm nhiều giọng nói nam và nữ đến từ các vùng miền khác nhau tại Anh. Bộ dữ liệu này cho phép nghiên cứu các mô hình TTS đa giọng, đồng thời đánh giá khả năng thích ứng của mô hình với sự khác biệt về ngữ điệu và phát âm (Veaux et al., 2017). Việc sử dụng dữ liệu đa giọng giúp hệ thống TTS tiến gần hơn đến khả năng tạo giọng nói đa dạng như con người.Ngoài các bộ dữ liệu tiếng Anh, xu hướng hiện nay là mở rộng dữ liệu sang nhiều ngôn ngữ khác nhau nhằm đáp ứng nhu cầu toàn cầu hóa của các hệ thống TTS. Common Voice là một dự án lớn do Mozilla khởi xướng, cung cấp dữ liệu giọng nói đa ngôn ngữ được đóng góp bởi cộng đồng. Dữ liệu trong Common Voice bao gồm nhiều ngôn ngữ và giọng đọc khác nhau, trong đó có tiếng Việt, tạo điều kiện thuận lợi cho việc nghiên cứu và phát triển các hệ thống TTS cho các ngôn ngữ ít tài nguyên (Mozilla, 2023). Tuy nhiên, do dữ liệu được thu thập từ nhiều nguồn khác nhau, chất lượng và tính đồng nhất của Common Voice thường không cao bằng các bộ dữ liệu chuyên dụng.Đối với tiếng Việt, việc xây dựng dữ liệu cho Text-to-Speech gặp nhiều thách thức do sự đa dạng về vùng miền, ngữ điệu và đặc trưng ngôn ngữ. VIVOS Dataset là một trong những bộ dữ liệu tiếng Việt tiêu biểu, được xây dựng nhằm phục vụ cho cả bài toán nhận dạng và tổng hợp giọng nói. Bộ dữ liệu này bao gồm các cặp văn bản và âm thanh được thu thập có kiểm soát, góp phần quan trọng vào việc thúc đẩy nghiên cứu TTS tiếng Việt (Luong et al., 2020). 
+
+ Tuy nhiên, quy mô dữ liệu tiếng Việt hiện nay vẫn còn hạn chế so với các ngôn ngữ phổ biến như tiếng Anh, đặt ra nhiều thách thức cho việc huấn luyện các mô hình học sâu quy mô lớn.Trong các hệ thống TTS thương mại, dữ liệu thường không được công bố chi tiết do liên quan đến bản quyền và bảo mật. Các công ty lớn như Google, Amazon và Microsoft sở hữu các tập dữ liệu giọng nói quy mô rất lớn, được thu thập và xử lý trong thời gian dài. Nhờ lợi thế về dữ liệu, các sản phẩm TTS thương mại thường đạt chất lượng giọng nói cao, ổn định và có khả năng hỗ trợ nhiều ngôn ngữ khác nhau (Google, 2023; Amazon Web Services, 2023). Tuy nhiên, việc thiếu minh bạch về dữ liệu cũng khiến cộng đồng nghiên cứu khó đánh giá đầy đủ tác động của dữ liệu đối với kết quả tổng hợp giọng nói.Nhìn chung, dữ liệu là yếu tố mang tính quyết định trong việc xây dựng và đánh giá các hệ thống Text-to-Speech. Sự đa dạng về bộ dữ liệu, từ đơn giọng đến đa giọng, từ ngôn ngữ phổ biến đến ngôn ngữ ít tài nguyên, phản ánh những nỗ lực không ngừng của cộng đồng nghiên cứu trong việc mở rộng phạm vi ứng dụng của TTS. Trong tương lai, việc xây dựng các bộ dữ liệu lớn hơn, đa dạng hơn và có chất lượng cao hơn sẽ tiếp tục là hướng đi quan trọng nhằm nâng cao hiệu quả và tính ứng dụng của các hệ thống tổng hợp giọng nói.
+
+V. NGHIÊN CỨU KHOA HỌC: CÔNG NGHỆ – PHƯƠNG PHÁP – GIẢI THUẬT
+
+Nghiên cứu khoa học đóng vai trò trung tâm trong sự phát triển của các hệ thống và công nghệ hiện đại, đặc biệt trong lĩnh vực công nghệ thông tin và trí tuệ nhân tạo. Phần nghiên cứu khoa học không chỉ phản ánh nền tảng lý thuyết mà còn thể hiện các hướng tiếp cận, kỹ thuật và giải thuật được cộng đồng học thuật đề xuất, thử nghiệm và cải tiến qua thời gian. Trong một bài nghiên cứu tổng hợp, việc phân tích các công trình nghiên cứu trước đây nhằm mục đích hệ thống hóa tri thức, làm rõ xu hướng phát triển và xác định những hướng tiếp cận chủ đạo đang được áp dụng rộng rãi.
+
+Về mặt công nghệ, sự phát triển của các hệ thống hiện đại gắn liền với tiến bộ trong lĩnh vực tính toán và xử lý dữ liệu. Các công nghệ nền tảng như điện toán hiệu năng cao, điện toán đám mây và học máy đã tạo điều kiện cho việc xây dựng các hệ thống có khả năng xử lý khối lượng dữ liệu lớn và thực hiện các tác vụ phức tạp với độ chính xác cao. Trong bối cảnh đó, trí tuệ nhân tạo, đặc biệt là học sâu, đã trở thành công nghệ cốt lõi, đóng vai trò trung tâm trong nhiều hướng nghiên cứu và ứng dụng. Các mô hình học sâu cho phép hệ thống tự động học đặc trưng từ dữ liệu, giảm sự phụ thuộc vào các quy tắc thủ công và nâng cao khả năng thích nghi với các bài toán phức tạp.
+
+Trên nền tảng công nghệ đó, nhiều phương pháp tiếp cận khác nhau đã được đề xuất nhằm giải quyết các bài toán nghiên cứu cụ thể. Phương pháp tiếp cận truyền thống thường dựa trên các quy tắc được thiết kế thủ công hoặc các mô hình thống kê cổ điển. Những phương pháp này có ưu điểm là dễ giải thích và triển khai, tuy nhiên thường gặp hạn chế về khả năng mở rộng và hiệu quả khi xử lý dữ liệu lớn hoặc dữ liệu có tính phi tuyến cao. Sự xuất hiện của các phương pháp dựa trên học máy và học sâu đã khắc phục phần nào những hạn chế này, cho phép hệ thống tự động học từ dữ liệu và cải thiện hiệu suất theo thời gian.
+
+Trong số các hướng tiếp cận hiện đại, phương pháp học có giám sát, học không giám sát và học tăng cường là ba nhóm phương pháp được nghiên cứu và ứng dụng rộng rãi. Học có giám sát dựa trên dữ liệu được gán nhãn, cho phép mô hình học mối quan hệ giữa đầu vào và đầu ra một cách trực tiếp. Học không giám sát tập trung vào việc khám phá cấu trúc tiềm ẩn trong dữ liệu mà không cần nhãn, phù hợp với các bài toán phân cụm hoặc giảm chiều dữ liệu. Trong khi đó, học tăng cường hướng đến việc tối ưu hóa hành vi của hệ thống thông qua cơ chế thưởng – phạt, đặc biệt phù hợp với các bài toán ra quyết định và điều khiển.
+
+Bên cạnh phương pháp tiếp cận, các kỹ thuật triển khai cũng đóng vai trò quan trọng trong việc hiện thực hóa các ý tưởng nghiên cứu. Các kỹ thuật tiền xử lý dữ liệu giúp cải thiện chất lượng dữ liệu đầu vào, từ đó nâng cao hiệu quả của mô hình. Kỹ thuật trích xuất đặc trưng được sử dụng để biểu diễn dữ liệu dưới dạng phù hợp với thuật toán học máy, trong khi các kỹ thuật tối ưu hóa giúp cải thiện tốc độ hội tụ và hiệu năng của mô hình. Việc lựa chọn và kết hợp các kỹ thuật này ảnh hưởng trực tiếp đến kết quả nghiên cứu và khả năng ứng dụng của hệ thống.
+
+Giải thuật là thành phần cốt lõi trong nghiên cứu khoa học, quyết định cách thức hệ thống xử lý dữ liệu và đưa ra kết quả. Trong quá trình phát triển của lĩnh vực, nhiều giải thuật đã được đề xuất và cải tiến nhằm nâng cao độ chính xác, giảm độ phức tạp tính toán và tăng khả năng mở rộng. Các giải thuật dựa trên mạng nơ-ron nhân tạo, đặc biệt là các kiến trúc học sâu, đã chứng minh hiệu quả vượt trội trong nhiều bài toán phức tạp. Tuy nhiên, việc áp dụng các giải thuật này đòi hỏi nguồn tài nguyên tính toán lớn và dữ liệu huấn luyện phong phú, đặt ra những thách thức không nhỏ trong thực tế.
+
+Một xu hướng quan trọng trong nghiên cứu hiện nay là hướng tiếp cận end-to-end, trong đó hệ thống được thiết kế để học trực tiếp từ dữ liệu đầu vào đến kết quả đầu ra mà không cần tách rời các bước xử lý trung gian. Cách tiếp cận này giúp đơn giản hóa quy trình thiết kế hệ thống và giảm sự phụ thuộc vào các giả định thủ công. Tuy nhiên, các hệ thống end-to-end cũng đặt ra yêu cầu cao về dữ liệu và khả năng kiểm soát, đòi hỏi các phương pháp đánh giá và giải thích mô hình phù hợp để đảm bảo độ tin cậy của kết quả.
+
+Ngoài ra, phương pháp nghiên cứu trong lĩnh vực công nghệ thông tin thường kết hợp giữa lý thuyết và thực nghiệm. Các công trình nghiên cứu không chỉ đề xuất mô hình hoặc giải thuật mới mà còn tiến hành thực nghiệm trên các bộ dữ liệu chuẩn để đánh giá hiệu quả. Việc so sánh với các phương pháp trước đó giúp làm rõ ưu điểm và hạn chế của giải pháp đề xuất, đồng thời cung cấp cơ sở khoa học cho việc lựa chọn phương pháp phù hợp trong từng bối cảnh ứng dụng.
+
+Trong bối cảnh nghiên cứu tổng hợp, việc phân tích và hệ thống hóa các công nghệ, phương pháp, kỹ thuật và giải thuật giúp làm rõ bức tranh toàn diện của lĩnh vực. Thay vì tập trung vào một giải pháp cụ thể, nghiên cứu tổng hợp nhấn mạnh mối quan hệ giữa các hướng tiếp cận, sự kế thừa và phát triển qua các giai đoạn nghiên cứu. Qua đó, có thể nhận diện được các xu hướng chủ đạo, các vấn đề còn tồn tại và những hướng nghiên cứu tiềm năng trong tương lai.
+
+Tổng hợp lại, nghiên cứu khoa học trong lĩnh vực công nghệ thông tin và trí tuệ nhân tạo là sự kết hợp chặt chẽ giữa công nghệ nền tảng, phương pháp tiếp cận, kỹ thuật triển khai và giải thuật xử lý. Mỗi thành phần đóng một vai trò nhất định, nhưng chỉ khi được kết hợp một cách hợp lý mới tạo ra các hệ thống hiệu quả và có giá trị ứng dụng cao. Trong một bài nghiên cứu tổng hợp, việc trình bày và phân tích các yếu tố này không chỉ giúp làm rõ nền tảng khoa học của đề tài mà còn cung cấp định hướng quan trọng cho các nghiên cứu và ứng dụng tiếp theo.
+
+VI. CHỈ SỐ ĐÁNH GIÁ – PHƯƠNG PHÁP ĐO
+
+Đánh giá chất lượng của hệ thống Text-to-Speech là một bước quan trọng nhằm xác định mức độ hiệu quả và khả năng ứng dụng của mô hình trong thực tế. Do giọng nói là một dạng tín hiệu mang tính cảm nhận cao, việc đánh giá TTS không thể chỉ dựa trên các chỉ số kỹ thuật thuần túy mà cần kết hợp cả yếu tố cảm nhận của con người. Vì lý do đó, các phương pháp đánh giá trong lĩnh vực Text-to-Speech thường được phân thành hai nhóm chính là đánh giá chủ quan và đánh giá khách quan, mỗi nhóm có vai trò và giá trị khác nhau trong quá trình phân tích chất lượng hệ thống (International Telecommunication Union, 2016).
+
+Đánh giá chủ quan, tiêu biểu là chỉ số Mean Opinion Score (MOS), được xem là phương pháp phản ánh trực tiếp và đáng tin cậy nhất chất lượng giọng nói tổng hợp. Phương pháp này dựa trên việc thu thập ý kiến của người nghe về mức độ tự nhiên, dễ nghe và dễ hiểu của giọng nói trên một thang điểm chuẩn. Ưu điểm lớn nhất của MOS là khả năng nắm bắt chính xác cảm nhận của con người, yếu tố mà các chỉ số kỹ thuật khó có thể biểu diễn đầy đủ. Tuy nhiên, phương pháp này đòi hỏi chi phí cao, thời gian triển khai dài và kết quả có thể bị ảnh hưởng bởi yếu tố chủ quan như kinh nghiệm nghe và bối cảnh đánh giá (ITU-T, 2016).
+
+Ngược lại, các phương pháp đánh giá khách quan được thiết kế nhằm cung cấp các thước đo định lượng, cho phép so sánh nhanh chóng và lặp lại giữa các mô hình TTS khác nhau. Mel-Cepstral Distortion là một chỉ số phổ biến trong nhóm này, được sử dụng để đo mức độ sai khác giữa giọng nói tổng hợp và giọng nói tham chiếu dựa trên đặc trưng phổ mel. Chỉ số này đặc biệt hữu ích trong giai đoạn huấn luyện và tối ưu mô hình, khi cần đánh giá hiệu quả cải tiến của thuật toán mà không phụ thuộc vào người nghe (Kubichek, 1993).
+
+Bên cạnh đó, Word Error Rate thường được sử dụng trong các hệ thống kết hợp giữa Text-to-Speech và nhận dạng giọng nói nhằm đánh giá mức độ rõ ràng và khả năng hiểu nội dung của giọng nói tổng hợp. Mặc dù WER không phản ánh trực tiếp độ tự nhiên của giọng nói, chỉ số này cung cấp góc nhìn bổ sung về khả năng truyền tải thông tin của hệ thống TTS, đặc biệt trong các ứng dụng yêu cầu độ chính xác cao như trợ lý ảo hoặc hệ thống đọc văn bản tự động.
+
+Ngoài chất lượng âm thanh, hiệu năng của hệ thống Text-to-Speech cũng là một tiêu chí quan trọng trong đánh giá và so sánh mô hình. Real-Time Factor được sử dụng để đo tốc độ tổng hợp giọng nói so với thời gian thực, qua đó phản ánh khả năng triển khai của hệ thống trong các ứng dụng yêu cầu phản hồi nhanh. Một hệ thống có RTF nhỏ hơn 1 được xem là đáp ứng tốt yêu cầu thời gian thực, trong khi các hệ thống có RTF lớn thường chỉ phù hợp cho xử lý ngoại tuyến hoặc nghiên cứu (Tan et al., 2021).
+
+Từ việc phân tích và so sánh các phương pháp đánh giá, có thể nhận thấy rằng không tồn tại một chỉ số đơn lẻ nào có khả năng phản ánh đầy đủ chất lượng của hệ thống Text-to-Speech. Các chỉ số chủ quan như MOS thể hiện rõ nhất cảm nhận của người nghe, nhưng lại thiếu tính linh hoạt và khó mở rộng trong quá trình đánh giá quy mô lớn. Ngược lại, các chỉ số khách quan như Mel-Cepstral Distortion và Word Error Rate cho phép so sánh định lượng giữa các mô hình, nhưng không thể thay thế hoàn toàn đánh giá cảm nhận của con người.
+
+Trong thực tiễn nghiên cứu và triển khai, các hệ thống TTS có chất lượng cao thường đạt được sự cân bằng giữa các nhóm chỉ số này. Một mô hình được đánh giá là hiệu quả không chỉ khi đạt điểm MOS cao mà còn khi duy trì được các chỉ số khách quan ở mức thấp và đáp ứng tốt yêu cầu về tốc độ xử lý. Sự kết hợp này cho phép đánh giá toàn diện cả chất lượng cảm nhận, độ chính xác kỹ thuật và khả năng ứng dụng thực tế của hệ thống.
+
+Đối với các hệ thống TTS hiện đại dựa trên học sâu, xu hướng chung là sử dụng MOS như tiêu chí đánh giá chính, đồng thời sử dụng các chỉ số khách quan và chỉ số hiệu năng như công cụ hỗ trợ trong quá trình huấn luyện và tối ưu mô hình. Cách tiếp cận đa chỉ số này giúp giảm thiểu rủi ro đánh giá sai lệch và cung cấp cái nhìn toàn diện hơn về chất lượng hệ thống trong các bối cảnh sử dụng khác nhau.
+
+Tổng kết lại, việc đánh giá và so sánh hệ thống Text-to-Speech cần được thực hiện dựa trên một khung đánh giá tổng hợp, kết hợp hài hòa giữa phương pháp chủ quan và khách quan. Cách tiếp cận này không chỉ phù hợp với đặc thù cảm nhận của giọng nói mà còn đáp ứng yêu cầu khoa học trong việc so sánh, tối ưu và triển khai các mô hình TTS trong thực tế. Trong xu hướng phát triển hiện nay, MOS tiếp tục giữ vai trò tiêu chuẩn vàng, trong khi các chỉ số khách quan và hiệu năng đóng vai trò quan trọng trong việc hỗ trợ cải tiến và đánh giá toàn diện hệ thống.
+
+Mô hình / Hệ thống
+
+MOS (1–5)
+
+MCD (dB)
+
+RTF
+
+Nhận xét tổng hợp
+
+FastSpeech
+
+~3.8 – 4.1
+
+~5.5 – 6.0
+
+< 0.1
+
+Tốc độ tổng hợp rất nhanh, độ ổn định cao, phù hợp ứng dụng thời gian thực; chất lượng tự nhiên ở mức khá
+
+FastSpeech2
+
+~4.1 – 4.4
+
+~4.5 – 5.0
+
+< 0.15
+
+Cải thiện rõ rệt ngữ điệu và độ tự nhiên so với FastSpeech, vẫn giữ hiệu năng cao
+
+VITS
+
+~4.4 – 4.6
+
+~3.8 – 4.3
+
+~0.3 – 0.6
+
+Chất lượng tự nhiên rất cao, giọng nói mượt và giàu biểu cảm; tốc độ thấp hơn, phù hợp bán thời gian thực
+
+TTS thương mại (Google, Amazon, Microsoft)
+
+~4.5 – 4.7
+
+Không công bố
+
+< 0.2
+
+Chất lượng ổn định, tối ưu cho triển khai quy mô lớn; thông số chi tiết thường không được công khai
+
+Bảng 1. So sánh các chỉ số đánh giá chất lượng hệ thống Text-to-Speech.
+
+Từ bảng so sánh có thể nhận thấy sự khác biệt rõ rệt giữa các nhóm hệ thống Text-to-Speech về mục tiêu tối ưu và đặc điểm kỹ thuật. Các mô hình thuộc họ FastSpeech thể hiện ưu thế vượt trội về tốc độ tổng hợp với chỉ số Real-Time Factor rất thấp, cho phép triển khai hiệu quả trong các ứng dụng yêu cầu phản hồi tức thời. Tuy nhiên, điểm MOS và MCD cho thấy chất lượng tự nhiên của giọng nói ở mức khá và phụ thuộc nhiều vào cấu hình huấn luyện.
+
+Ngược lại, VITS đạt được điểm MOS cao và MCD thấp, phản ánh chất lượng giọng nói tự nhiên và độ trung thực âm thanh vượt trội. Đổi lại, chỉ số RTF cao hơn cho thấy chi phí tính toán lớn hơn, khiến mô hình này phù hợp hơn với các ứng dụng bán thời gian thực hoặc xử lý ngoại tuyến.
+
+Các hệ thống TTS thương mại đạt được sự cân bằng giữa chất lượng và hiệu năng, với MOS cao và RTF thấp, nhờ vào việc tối ưu hóa hạ tầng và mô hình ở mức hệ thống. Tuy nhiên, do hạn chế về tính minh bạch, các chỉ số kỹ thuật chi tiết như MCD thường không được công bố, khiến việc so sánh trực tiếp với các mô hình nghiên cứu gặp nhiều khó khăn.
+
+Kết quả so sánh cho thấy không tồn tại một mô hình Text-to-Speech tối ưu cho mọi bối cảnh sử dụng. Việc lựa chọn hệ thống phù hợp cần dựa trên sự cân bằng giữa chất lượng cảm nhận, hiệu năng tính toán và yêu cầu triển khai thực tế.
+
+VII. KẾT LUẬN
+
+Nghiên cứu này đã tiến hành tổng hợp và hệ thống hóa các nội dung trọng tâm của lĩnh vực Text-to-Speech theo từng cụm vấn đề có tính liên kết chặt chẽ, bao gồm các sản phẩm và hệ thống tiêu biểu, nền tảng mã nguồn và công cụ hỗ trợ, đặc điểm dữ liệu sử dụng, các hướng nghiên cứu khoa học chủ đạo cũng như các chỉ số và phương pháp đánh giá chất lượng. Thông qua cách tiếp cận tổng quan này, bài viết đã làm rõ tiến trình phát triển của công nghệ TTS từ nghiên cứu học thuật đến triển khai ứng dụng trong thực tiễn.
+
+Trên cơ sở các nội dung đã trình bày, có thể nhận thấy rằng công nghệ học sâu đóng vai trò trung tâm trong sự phát triển của các hệ thống Text-to-Speech hiện đại. Sự tiến bộ của các mô hình học sâu không chỉ góp phần nâng cao độ tự nhiên và tính biểu cảm của giọng nói tổng hợp, mà còn cải thiện đáng kể hiệu năng xử lý và khả năng triển khai trong các ứng dụng quy mô lớn. Chuỗi lập luận xuyên suốt bài viết đã dẫn dắt và làm rõ mục tiêu nghiên cứu là đánh giá một cách hệ thống các thành phần cấu thành và tiêu chí đo lường chất lượng của hệ thống TTS, qua đó khẳng định tính cấp thiết của đề tài trong bối cảnh tương tác người – máy ngày càng phát triển.
+
+Những kết quả tổng hợp đạt được góp phần làm rõ bối cảnh và lý do lựa chọn đề tài, đồng thời nhấn mạnh tiềm năng ứng dụng rộng rãi của công nghệ Text-to-Speech trong nhiều lĩnh vực khác nhau, từ trợ lý ảo, giáo dục, y tế đến các hệ thống dịch vụ tự động. Việc nhận diện rõ các xu hướng công nghệ, mô hình tiêu biểu và phương pháp đánh giá cũng tạo nền tảng tham khảo có giá trị cho các nghiên cứu và ứng dụng tiếp theo trong lĩnh vực này.
+
+Trong định hướng nghiên cứu tương lai, theo chiều rộng, các nghiên cứu có thể mở rộng phạm vi bằng cách bổ sung thêm các cụm vấn đề mới hoặc xem xét công nghệ TTS trong các bối cảnh đa ngôn ngữ và đa giọng nói. Đồng thời, theo chiều sâu, các hướng nghiên cứu có thể tập trung phân tích chi tiết hơn một số mô hình, giải thuật hoặc phương pháp đánh giá cụ thể, nhằm làm rõ hơn mối quan hệ giữa chất lượng cảm nhận, hiệu năng tính toán và khả năng ứng dụng của hệ thống Text-to-Speech trong các bối cảnh sử dụng khác nhau.
+
+TÀI LIỆU THAM KHẢO
+
+Google. (2023). Google Cloud Text-to-Speech documentation.https://cloud.google.com/text-to-speech
+
+Amazon Web Services. (2023). Amazon Polly documentation.https://docs.aws.amazon.com/polly/
+
+Microsoft. (2023). Azure Speech service documentation.https://learn.microsoft.com/azure/cognitive-services/speech-service/
+
+IBM. (2022). IBM Watson Text to Speech.https://www.ibm.com/cloud/watson-text-to-speech
+
+FPT. (2023). Nền tảng chuyển văn bản thành giọng nói FPT.AI.https://fpt.ai/vi/text-to-speech
+
+Viettel AI. (2023). Giải pháp tổng hợp giọng nói tiếng Việt.https://viettelai.vn
+
+Coqui AI. (2023). Coqui TTS: Open-source text-to-speech.https://github.com/coqui-ai/TTS
+
+Mozilla. (2020). Mozilla Text-to-Speech.https://github.com/mozilla/TTS
+
+ESPnet. (2021). ESPnet: End-to-end speech processing toolkit.https://github.com/espnet/espnet
+
+Ren, Y., Hu, C., Tan, X., Qin, T., Zhao, S., Zhao, Z., & Liu, T. (2019).FastSpeech: Fast, robust and controllable text to speech.Advances in Neural Information Processing Systems.https://arxiv.org/abs/1905.09263
+
+Kim, J., Kong, J., & Son, J. (2021).Conditional variational autoencoder with adversarial learning for end-to-end text-to-speech.International Conference on Machine Learning.
+
+Ito, K. (2017). The LJ Speech dataset.https://keithito.com/LJ-Speech-Dataset/
+
+Veaux, C., Yamagishi, J., & MacDonald, K. (2017).CSTR VCTK Corpus: English multi-speaker corpus.https://datashare.ed.ac.uk/handle/10283/3443
+
+Mozilla. (2023). Common Voice dataset.https://commonvoice.mozilla.org
+
+Gluon, H. M., et al. (2020).VIVOS: A Vietnamese speech corpus.https://ailab.hcmus.edu.vn/vivos
+
+Oord, A. van den, Dieleman, S., Zen, H., et al. (2016).WaveNet: A generative model for raw audio.arXiv preprint arXiv:1609.03499.
+
+Shen, J., Pang, R., Weiss, R. J., et al. (2018).Natural TTS synthesis by conditioning WaveNet on mel spectrogram predictions.ICASSP.https://arxiv.org/abs/1712.05884
+
+Tan, X., Qin, T., Soong, F., & Liu, T. (2021).A survey on neural speech synthesis.IEEE Transactions on Neural Networks and Learning Systems.
+
+International Telecommunication Union. (2016).Methods for subjective determination of transmission quality (MOS).ITU-T Recommendation P.800.
+
+Kubichek, R. (1993).Mel-cepstral distance measure for objective speech quality assessment.IEEE Pacific Rim Conference.
+
+Taylor, P. (2009). Text-to-Speech synthesis. Cambridge University Press.
+
+Zen, H., Tokuda, K., & Black, A. W. (2009). Statistical parametric speech synthesis. Speech Communication, 51(11), 1039–1064.
+
+Tokuda, K., Yoshimura, T., Masuko, T., Kobayashi, T., & Kitamura, T. (2000). Speech parameter generation algorithms for HMM-based speech synthesis. ICASSP.
+
+Wang, Y., Skerry-Ryan, R. J., Stanton, D., et al. (2017). Tacotron: Towards end-to-end speech synthesis. ICASSP.https://arxiv.org/abs/1703.10135
+
+Wang, Y., Stanton, D., Zhang, Y., et al. (2018). Tacotron 2: Natural TTS synthesis by conditioning WaveNet on mel spectrogram predictions. ICASSP.https://arxiv.org/abs/1712.05884
+
+Ping, W., Peng, K., & Chen, J. (2018). Deep Voice 3: Scaling text-to-speech with convolutional sequence learning. ICLR.https://arxiv.org/abs/1710.07654
+
+Ping, W., Peng, K., Gibiansky, A., et al. (2017). Deep Voice: Real-time neural text-to-speech. ICML.https://arxiv.org/abs/1702.07825
+
+Kumar, K., Kumar, R., de Boissiere, T., et al. (2019). MelGAN: Generative adversarial networks for conditional waveform synthesis. NeurIPS.https://arxiv.org/abs/1910.06711
+
+Kong, J., Kim, J., & Bae, J. (2020). HiFi-GAN: Generative adversarial networks for efficient and high fidelity speech synthesis. NeurIPS.https://arxiv.org/abs/2010.05646
+
+Valle, R., Shih, K. J., Prenger, R., & Catanzaro, B. (2020). Flowtron: An autoregressive flow-based generative network for text-to-speech synthesis. ICLR.
+
+Jia, Y., Zhang, Y., Weiss, R. J., et al. (2018). Transfer learning from speaker verification to multispeaker text-to-speech synthesis. NeurIPS.https://arxiv.org/abs/1806.04558
+
+Arik, S. O., Chen, J., Peng, K., Ping, W., & Zhou, Y. (2017). Neural Voice Cloning with a few samples. NeurIPS.https://arxiv.org/abs/1802.06006
+
+Black, A. W., & Taylor, P. (1997). The Festival speech synthesis system. University of Edinburgh.
+
+Hunt, A. J., & Black, A. W. (1996). Unit selection in a concatenative speech synthesis system. ICASSP.
+
+ITU-T. (2017). Perceptual evaluation of speech quality (PESQ). Recommendation P.862.
+
+Rix, A. W., Beerends, J. G., Hollier, M. P., & Hekstra, A. P. (2001). Perceptual evaluation of speech quality (PESQ). ICASSP.
+
+Valin, J. M., & Skoglund, J. (2019). LPCNet: Improving neural speech synthesis through linear prediction. ICASSP.https://arxiv.org/abs/1810.11846
+
+Chen, N., Watanabe, S., & Hori, T. (2016). End-to-end attention-based large vocabulary speech recognition. ICASSP.
+
+Rabiner, L. R. (1989). A tutorial on hidden Markov models and selected applications in speech recognition. Proceedings of the IEEE.
+
+Jurafsky, D., & Martin, J. H. (2023). Speech and Language Processing (3rd ed.). Pearson.

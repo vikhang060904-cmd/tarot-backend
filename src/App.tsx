@@ -1,114 +1,166 @@
-  import { useState, useEffect } from "react";
-  import UI from "./components/UI";
-  import LoginPage from "./components/LoginPage";
-  import { BrowserRouter, Routes, Route } from "react-router-dom";
-  import AdminDashboard from "./pages/AdminDashboard";
+import { useState, useEffect, useCallback } from "react";
+import UI from "./components/UI";
+import LoginPage from "./components/LoginPage";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import AdminDashboard from "./pages/AdminDashboard";
+import { SPREAD_TYPES } from "./constants/spreads";
 
-  interface Card {
-    name: string;
-    suit: string;
-    image: string;
-    index?: number;
-  }
+interface Card {
+  name: string;
+  suit: string;
+  image: string;
+  index?: number;
+}
 
-  interface User {
-    email: string;
-  }
+interface User {
+  email: string;
+}
 
-  interface TarotChatMessage {
-    role: "user" | "assistant";
-    content: string;
-  }
+interface TarotChatMessage {
+  role: "user" | "assistant";
+  content: string;
+}
 
-  type PageName = "tarot" | "energy" | "history" | "profile";
+type PageName = "tarot" | "energy" | "history" | "profile";
 
-  const READING_COST = 5;
-  const DEFAULT_TOKENS = 0;
-  const API_BASE = "http://127.0.0.1:8002";
+let READING_COST = 5;
+const DEFAULT_TOKENS = 0;
+const API_BASE = "";
 
-  const App = () => {
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
-    const [user, setUser] = useState<User | null>(null);
+const App = () => {
+  const [isLoggedIn, setIsLoggedIn] = useState(() => !!localStorage.getItem("email"));
+  const [user, setUser] = useState<User | null>(() => {
+    const saved = localStorage.getItem("email");
+    return saved ? { email: saved } : null;
+  });
 
-    const [currentPage, setCurrentPage] = useState<PageName>("tarot");
-    const [busy, setBusy] = useState(false);
-    const [followUpBusy, setFollowUpBusy] = useState(false);
+  const [currentPage, setCurrentPage] = useState<PageName>(() => {
+    return (localStorage.getItem("currentPage") as PageName) || "tarot";
+  });
+  const [busy, setBusy] = useState(false);
+  const [followUpBusy, setFollowUpBusy] = useState(false);
 
-    const [allCards, setAllCards] = useState<Card[]>([]);
-    const [selectedCards, setSelectedCards] = useState<Card[]>([]);
-    const [question, setQuestion] = useState("");
-    const [currentTopic, setCurrentTopic] = useState("general");
+  const [allCards, setAllCards] = useState<Card[]>([]);
+  const [selectedCards, setSelectedCards] = useState<Card[]>([]);
+  const [question, setQuestion] = useState("");
+  const [currentTopic, setCurrentTopic] = useState("general");
+  const [birthDate, setBirthDate] = useState(() => localStorage.getItem("birthDate") || "");
 
-    const [conversationId, setConversationId] = useState("");
-    const [tarotMessages, setTarotMessages] = useState<TarotChatMessage[]>([]);
-    const [hasChargedCurrentReading, setHasChargedCurrentReading] = useState(false);
-    const [waitingForClarification, setWaitingForClarification] = useState(false);
+  // PERSISTENT STATE
+  const [result, setResult] = useState(() => localStorage.getItem("tarotResult") || "");
+  const [conversationId, setConversationId] = useState<string>(() => localStorage.getItem("conversationId") || "");
+  const [tarotMessages, setTarotMessages] = useState<TarotChatMessage[]>(() => {
+    try {
+      const saved = localStorage.getItem("tarotMessages");
+      return saved ? JSON.parse(saved) : [];
+    } catch { return []; }
+  });
 
-    const [tokens, setTokens] = useState(DEFAULT_TOKENS);
+  const [spreadType, setSpreadType] = useState(SPREAD_TYPES[1].id); // Default to Three Card
+  const [hasChargedCurrentReading, setHasChargedCurrentReading] = useState(false);
+  const [waitingForClarification, setWaitingForClarification] = useState(false);
 
-// ✅ DÁN NGAY DƯỚI ĐÂY
-useEffect(() => {
-  if (!user?.email) return;
+  const [tokens, setTokens] = useState(DEFAULT_TOKENS);
 
-  fetch(`http://127.0.0.1:8002/api/users/profile-summary?email=${user.email}`)
-    .then(res => res.json())
-    .then(data => {
-      if (data.success) {
-        setTokens(data.token_balance);
-      }
+  useEffect(() => {
+    if (!user?.email) return;
+
+    fetch(`${API_BASE}/api/users/tokens?email=${user.email}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success) {
+          setTokens(data.token_balance);
+        }
+      });
+  }, [user?.email]);
+
+  useEffect(() => {
+    fetch(`${API_BASE}/api/tarot/config`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success) {
+          READING_COST = data.reading_cost;
+        }
+      })
+      .catch((err) => console.error("Error loading tarot cost config:", err));
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("currentPage", currentPage);
+  }, [currentPage]);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const status = params.get("status");
+
+    if (status === "success") {
+      alert("🎉 Thanh toán thành công!");
+      const tier = localStorage.getItem("pending_tier");
+      if (tier === "starter") setTokens((prev) => prev + 50);
+      if (tier === "pro") setTokens((prev) => prev + 150);
+      if (tier === "premium") setTokens((prev) => prev + 300);
+      localStorage.removeItem("pending_tier");
+      window.history.replaceState({}, "", "/");
+    }
+
+    if (status === "cancel") {
+      alert("❌ Bạn đã hủy thanh toán");
+      localStorage.removeItem("pending_tier");
+      window.history.replaceState({}, "", "/");
+    }
+  }, []);
+
+  const updateSpreadType = (type: string) => {
+    setSpreadType(type);
+    const spread = SPREAD_TYPES.find(s => s.id === type);
+    if (spread) {
+      if (spread.category === 'Tâm linh') setDeckArrangement('spiral');
+      else if (spread.category === 'Tình duyên') setDeckArrangement('fan');
+      else if (spread.category === 'Nâng cao') setDeckArrangement('rows');
+      else setDeckArrangement('arc');
+      setDealCount(spread.count);
+    }
+  };
+
+  const resetTarotState = () => {
+    setAllCards([]);
+    setSelectedCards([]);
+    setQuestion("");
+    setCurrentTopic("general");
+    setResult("");
+    setConversationId("");
+    setTarotMessages([]);
+    setHasChargedCurrentReading(false);
+    setWaitingForClarification(false);
+    localStorage.removeItem("tarotResult");
+    localStorage.removeItem("conversationId");
+    localStorage.removeItem("tarotMessages");
+  };
+
+
+  const pushAssistant = (content: string) => {
+    if (!content) return;
+    setTarotMessages((prev) => {
+      const next = [...prev, { role: "assistant" as const, content }];
+      localStorage.setItem("tarotMessages", JSON.stringify(next));
+      return next;
     });
-}, [user?.email]);
-    useEffect(() => {
-  const params = new URLSearchParams(window.location.search);
-  const status = params.get("status");
+  };
 
-  if (status === "success") {
-    alert("🎉 Thanh toán thành công!");
+  const pushUser = (content: string) => {
+    if (!content) return;
+    setTarotMessages((prev) => {
+      const next = [...prev, { role: "user" as const, content }];
+      localStorage.setItem("tarotMessages", JSON.stringify(next));
+      return next;
+    });
+  };
 
-    const tier = localStorage.getItem("pending_tier");
-
-    if (tier === "starter") setTokens(prev => prev + 50);
-    if (tier === "pro") setTokens(prev => prev + 150);
-    if (tier === "premium") setTokens(prev => prev + 300);
-
-    localStorage.removeItem("pending_tier");
-
-    window.history.replaceState({}, "", "/");
-  }
-
-  if (status === "cancel") {
-    alert("❌ Bạn đã hủy thanh toán");
-    localStorage.removeItem("pending_tier");
-    window.history.replaceState({}, "", "/");
-  }
-}, []);
-    const resetTarotState = () => {
-      setAllCards([]);
-      setSelectedCards([]);
-      setQuestion("");
-      setCurrentTopic("general");
-      setConversationId("");
-      setTarotMessages([]);
-      setHasChargedCurrentReading(false);
-      setWaitingForClarification(false);
-    };
-
-    const pushAssistant = (content: string) => {
-      if (!content) return;
-      setTarotMessages((prev) => [...prev, { role: "assistant", content }]);
-    };
-
-    const pushUser = (content: string) => {
-      if (!content) return;
-      setTarotMessages((prev) => [...prev, { role: "user", content }]);
-    };
-
-    const handleLogin = (email: string) => {
-    const role = localStorage.getItem("role"); // lấy từ login API
+  const handleLogin = (email: string) => {
+    const role = localStorage.getItem("role");
+    localStorage.setItem("email", email);
     setUser({ email });
     setIsLoggedIn(true);
-
-    // 👉 QUAN TRỌNG
     if (role === "admin") {
       window.location.href = "/admin";
     } else {
@@ -116,258 +168,227 @@ useEffect(() => {
     }
   };
 
-    const handleLogout = () => {
-      setIsLoggedIn(false);
-      setUser(null);
-      setCurrentPage("tarot");
-      setTokens(DEFAULT_TOKENS);
-      resetTarotState();
-    };
+  const handleLogout = useCallback(() => {
+    localStorage.removeItem("email");
+    localStorage.removeItem("role");
+    localStorage.removeItem("currentPage");
+    localStorage.removeItem("tarotResult");
+    localStorage.removeItem("conversationId");
+    localStorage.removeItem("tarotMessages");
+    setIsLoggedIn(false);
+    setUser(null);
+    setCurrentPage("tarot");
+    setTokens(DEFAULT_TOKENS);
+    resetTarotState();
+  }, []);
 
-    const handlePaymentSuccess = (addedTokens: number) => {
-      setTokens((prev) => prev + addedTokens);
-    };
+  const handlePaymentSuccess = (addedTokens: number) => {
+    setTokens((prev) => prev + addedTokens);
+  };
 
-    const dealAllCards = async () => {
-      if (busy || !isLoggedIn) return;
+  const [dealMode, setDealMode] = useState<"random" | "fixed" | "seeded" | "custom" | "bysuit">("random");
+  const [dealSuit, setDealSuit] = useState<string>("");
+  const [dealSeed, setDealSeed] = useState<number>(0);
+  const [dealCount, setDealCount] = useState<number>(3);
+  const [deckArrangement, setDeckArrangement] = useState<"fan" | "arc" | "rows" | "spiral" | "infinity" | "waves" | "chaos" | "orbit">("arc");
+  const maxSelectable = SPREAD_TYPES.find(s => s.id === spreadType)?.count || 3;
 
-      setBusy(true);
-      setConversationId("");
-      setTarotMessages([]);
-      setHasChargedCurrentReading(false);
-      setWaitingForClarification(false);
+  const resetReading = useCallback(() => {
+    setResult("");
+    setConversationId("");
+    setTarotMessages([]);
+    setSelectedCards([]);
+    setQuestion("");
+    setHasChargedCurrentReading(false);
+    setWaitingForClarification(false);
+    
+    localStorage.removeItem("tarotResult");
+    localStorage.removeItem("conversationId");
+    localStorage.removeItem("tarotMessages");
+    localStorage.removeItem("question");
+    
+    setCurrentPage("tarot");
+  }, []);
 
-      try {
-        const res = await fetch(`${API_BASE}/api/all_cards`);
-        if (!res.ok) throw new Error(`API Error: ${res.status}`);
-
-        const data = await res.json();
-        if (!data.cards || !Array.isArray(data.cards)) {
-          throw new Error("Invalid response format");
-        }
-
-        const shuffled: Card[] = [...data.cards]
-          .sort(() => Math.random() - 0.5)
-          .map((card: Card, idx: number) => ({
-            ...card,
-            index: idx,
-          }));
-
-        setAllCards(shuffled);
-        setSelectedCards([]);
-      } catch (error) {
-        console.error("Error dealing cards:", error);
-        alert("❌ Lỗi khi chia bài! Vui lòng thử lại.");
-      } finally {
-        setBusy(false);
+  const dealAllCards = useCallback(async () => {
+    if (busy || !isLoggedIn) return [];
+    setBusy(true);
+    resetTarotState();
+    try {
+      const res = await fetch(`${API_BASE}/api/all_cards`);
+      if (!res.ok) throw new Error(`API Error: ${res.status}`);
+      const data = await res.json();
+      const all: Card[] = data.cards.map((card: Card, idx: number) => ({ ...card, index: idx }));
+      
+      let finalDeck = [...all];
+      if (dealMode === "random") finalDeck.sort(() => Math.random() - 0.5);
+      else if (dealMode === "seeded") {
+          let r = dealSeed;
+          const rand = () => { r = (r * 1664525 + 1013904223) % 4294967296; return r / 4294967296; };
+          finalDeck.sort(() => rand() - 0.5);
+      } else if (dealMode === "bysuit" && dealSuit) {
+          finalDeck = all.filter(c => c.suit?.toLowerCase() === dealSuit.toLowerCase()).sort(() => Math.random() - 0.5);
+      } else if (dealMode === "custom") {
+          finalDeck = [...all].sort(() => Math.random() - 0.5).slice(0, dealCount);
       }
-    };
+      setAllCards(finalDeck);
+      setSelectedCards([]);
+      return finalDeck;
+    } catch (e) {
+      console.error(e);
+      return [];
+    } finally {
+      setBusy(false);
+    }
+  }, [busy, isLoggedIn, dealMode, dealSeed, dealSuit, dealCount]);
 
-    const selectCard = (card: Card) => {
-      if (!isLoggedIn || busy || followUpBusy) return;
+  const selectCard = useCallback((card: Card) => {
+    setSelectedCards((prev) => {
+      if (prev.some(c => c.index === card.index)) return prev.filter(c => c.index !== card.index);
+      if (prev.length >= maxSelectable) return prev;
+      return [...prev, card];
+    });
+  }, [maxSelectable]);
 
-      setSelectedCards((prev) => {
-        const found = prev.find((c) => c.index === card.index);
+  const confirmCards = useCallback(async (overrideTopic?: string) => {
+    if (!isLoggedIn || selectedCards.length !== maxSelectable) return;
+    if (tokens < READING_COST) {
+      const isEn = localStorage.getItem("tarot_lang") === "en";
+      alert(isEn ? "⚠️ Not enough tokens." : "⚠️ Bạn không đủ token.");
+      setCurrentPage("energy");
+      return;
+    }
+    const userQuestion = question.trim();
+    setBusy(true);
+    setResult("");
+    setWaitingForClarification(false);
+    
+    // Clear old state
+    setTarotMessages([]);
+    localStorage.removeItem("tarotMessages");
+    localStorage.removeItem("tarotResult");
+    localStorage.removeItem("conversationId");
 
-        if (found) {
-          return prev.filter((c) => c.index !== card.index);
-        }
+    if (userQuestion) {
+      pushUser(userQuestion);
+    }
 
-        if (prev.length >= 3) {
-          alert("⚠️ Chỉ được chọn 3 lá!");
-          return prev;
-        }
-
-        return [...prev, card];
+    try {
+      const res = await fetch(`${API_BASE}/api/tarot`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          user_email: user?.email || "",
+          topic: overrideTopic || currentTopic,
+          question: userQuestion,
+          cards: selectedCards,
+          spread_type: spreadType,
+          birth_date: birthDate,
+          language: localStorage.getItem("tarot_lang") || "vi",
+        }),
       });
-    };
-
-    const confirmCards = async () => {
-      if (!isLoggedIn) {
-        alert("⚠️ Bạn cần đăng nhập trước khi sử dụng.");
-        return;
-      }
-
-      if (selectedCards.length !== 3) {
-        alert("⚠️ Hãy chọn đúng 3 lá bài!");
-        return;
-      }
-
-      if (tokens < READING_COST) {
-        alert("⚠️ Bạn không đủ token. Hãy vào mục Năng Lượng để nạp thêm.");
-        setCurrentPage("energy");
-        return;
-      }
-
-      const userQuestion = question.trim();
-
-      setBusy(true);
-      setTarotMessages([]);
-      setWaitingForClarification(false);
-
-      if (userQuestion) {
-        pushUser(userQuestion);
-      }
-
-      try {
-        const res = await fetch(`${API_BASE}/api/tarot`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            user_email: user?.email || "",
-            topic: currentTopic,
-            question: userQuestion,
-            cards: selectedCards,
-          }),
-        });
-
-        if (!res.ok) {
-          const text = await res.text();
-          throw new Error(text || `API Error: ${res.status}`);
-        }
-
-        const data = await res.json();
-        console.log("TAROT RESPONSE =", data);
-        console.log("conversation_id =", data?.conversation_id);
-
-        setConversationId(data.conversation_id || "");
-
-        if (data.need_more_info) {
-          setWaitingForClarification(true);
-          pushAssistant(
-            data.follow_up_question || "Bạn hãy nói rõ hơn để mình luận giải chính xác."
-          );
-          return;
-        }
-
+      const data = await res.json();
+      if (data.need_tokens) { setCurrentPage("energy"); return; }
+      
+      if (data.need_more_info) {
+        setWaitingForClarification(true);
+        const isEn = localStorage.getItem("tarot_lang") === "en";
+        pushAssistant(data.follow_up_question || (isEn ? "Please clarify." : "Bạn hãy nói rõ hơn."));
+      } else {
         setWaitingForClarification(false);
-        pushAssistant(data.answer || "⚠️ Không có kết quả trả về.");
-
-        if (!hasChargedCurrentReading) {
-          setTokens((prev) => Math.max(0, prev - READING_COST));
-          setHasChargedCurrentReading(true);
+        setResult(data.answer || "");
+        localStorage.setItem("tarotResult", data.answer || "");
+        pushAssistant(data.answer || "");
+        
+        if (data.conversation_id) {
+          setConversationId(data.conversation_id);
+          localStorage.setItem("conversationId", data.conversation_id);
         }
-      } catch (error) {
-        console.error("Error getting reading:", error);
-        pushAssistant("❌ Lỗi khi kết nối Tarot AI.");
-      } finally {
-        setBusy(false);
       }
-    };
-
-    const askTarotFollowUp = async (message: string) => {
-      const cleaned = message.trim();
-      if (!cleaned) return;
-
-      if (!conversationId) {
-        alert("⚠️ Hãy trải bài trước.");
-        return;
+      
+      if (user?.email) {
+          const tRes = await fetch(`${API_BASE}/api/users/tokens?email=${user.email}`);
+          const tData = await tRes.json();
+          if (tData.success) setTokens(tData.token_balance);
       }
+    } catch (e) {
+      console.error(e);
+      const isEn = localStorage.getItem("tarot_lang") === "en";
+      pushAssistant(isEn ? "❌ Error connecting to Tarot AI." : "❌ Lỗi khi kết nối Tarot AI.");
+    } finally {
+      setBusy(false);
+    }
+  }, [isLoggedIn, selectedCards, maxSelectable, tokens, question, currentTopic, user?.email, spreadType]);
 
-      pushUser(cleaned);
-      setFollowUpBusy(true);
+  const askTarotFollowUp = useCallback(async (message: string) => {
+    console.log("DEBUG: askTarotFollowUp start, message:", message, "convId:", conversationId);
+    const cleaned = message.trim();
+    if (!cleaned || !conversationId) {
+      console.error("DEBUG: Missing message or conversationId", { cleaned, conversationId });
+      return;
+    }
 
-      try {
-        const res = await fetch(`${API_BASE}/api/tarot/follow-up`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            conversation_id: conversationId,
-            message: cleaned,
-            user_email: user?.email || "",
-          }),
-        });
+    pushUser(cleaned);
+    setFollowUpBusy(true);
 
-        if (!res.ok) {
-          const text = await res.text();
-          throw new Error(text || `API Error: ${res.status}`);
-        }
-
-        const data = await res.json();
-        console.log("TAROT FOLLOW UP RESPONSE =", data);
-
-        if (data.need_more_info) {
-          setWaitingForClarification(true);
-          pushAssistant(data.follow_up_question || "Bạn hãy nói rõ hơn nhé.");
-          return;
-        }
-
+    try {
+      const res = await fetch(`${API_BASE}/api/tarot/follow-up`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          conversation_id: conversationId,
+          message: cleaned,
+          user_email: user?.email || "",
+          language: localStorage.getItem("tarot_lang") || "vi",
+        }),
+      });
+      const data = await res.json();
+      if (data.need_more_info) {
+        setWaitingForClarification(true);
+        const isEn = localStorage.getItem("tarot_lang") === "en";
+        pushAssistant(data.follow_up_question || (isEn ? "Please clarify." : "Nói rõ hơn nhé."));
+      } else {
         setWaitingForClarification(false);
-        pushAssistant(data.answer || "⚠️ Không có câu trả lời tiếp theo.");
-
-        if (!hasChargedCurrentReading) {
-          setTokens((prev) => Math.max(0, prev - READING_COST));
-          setHasChargedCurrentReading(true);
+        pushAssistant(data.answer || "");
+        
+        // Sync tokens from backend
+        if (user?.email) {
+          const tRes = await fetch(`${API_BASE}/api/users/tokens?email=${user.email}`);
+          const tData = await tRes.json();
+          if (tData.success) setTokens(tData.token_balance);
         }
-      } catch (error) {
-        console.error("Error follow-up tarot:", error);
-        pushAssistant("❌ Không thể xử lý câu hỏi tiếp theo lúc này.");
-      } finally {
-        setFollowUpBusy(false);
       }
-    };
+    } catch (e) {
+      console.error(e);
+      const isEn = localStorage.getItem("tarot_lang") === "en";
+      pushAssistant(isEn ? "❌ System error." : "❌ Lỗi hệ thống.");
+    } finally {
+      setFollowUpBusy(false);
+    }
+  }, [conversationId, user?.email, hasChargedCurrentReading]);
 
-    return (
+  return (
     <BrowserRouter>
       <Routes>
-
-        <Route
-          path="/login"
-          element={<LoginPage onLogin={handleLogin} />}
-        />
-
-        <Route
-    path="/admin"
-    element={
-      localStorage.getItem("role") === "admin" ? (
-        <AdminDashboard />
-      ) : (
-        <div style={{ padding: 50 }}>❌ Không có quyền</div>
-      )
-    }
-  />
-
-        <Route
-          path="/"
-          element={
-            !isLoggedIn ? (
-              <LoginPage onLogin={handleLogin} />
-            ) : (
-              <UI
-                isLoggedIn={isLoggedIn}
-                currentPage={currentPage}
-                onPageChange={setCurrentPage}
-                user={user}
-                onLogout={handleLogout}
-                busy={busy}
-                allCards={allCards}
-                selectedCards={selectedCards}
-                result=""
-                question={question}
-                currentTopic={currentTopic}
-                onDealAll={dealAllCards}
-                onSelectCard={selectCard}
-                onConfirm={confirmCards}
-                onSetQuestion={setQuestion}
-                onSetTopic={setCurrentTopic}
-                tokens={tokens}
-                onPaymentSuccess={handlePaymentSuccess}
-                tarotMessages={tarotMessages}
-                onAskTarotFollowUp={askTarotFollowUp}
-                followUpBusy={followUpBusy}
-                conversationId={conversationId}
-                waitingForClarification={waitingForClarification}
-              />
-            )
-          }
-        />
-
+        <Route path="/login" element={<LoginPage onLogin={handleLogin} />} />
+        <Route path="/admin" element={localStorage.getItem("role") === "admin" ? <AdminDashboard /> : <div style={{ padding: 50 }}>❌ Không quyền</div>} />
+        <Route path="/" element={!isLoggedIn ? <LoginPage onLogin={handleLogin} /> : (
+          <UI
+            isLoggedIn={isLoggedIn} currentPage={currentPage} onPageChange={setCurrentPage} user={user} onLogout={handleLogout}
+            busy={busy} allCards={allCards} selectedCards={selectedCards} result={result} question={question} currentTopic={currentTopic}
+            onDealAll={dealAllCards} onSelectCard={selectCard} onConfirm={confirmCards} onSetQuestion={setQuestion} onSetTopic={setCurrentTopic}
+            tokens={tokens} onPaymentSuccess={handlePaymentSuccess} tarotMessages={tarotMessages} onAskTarotFollowUp={askTarotFollowUp}
+            followUpBusy={followUpBusy} conversationId={conversationId} waitingForClarification={waitingForClarification}
+            dealMode={dealMode} onSetDealMode={setDealMode} dealSuit={dealSuit} onSetDealSuit={setDealSuit} maxSelectable={maxSelectable}
+            dealSeed={dealSeed} onSetDealSeed={setDealSeed} dealCount={dealCount} onSetDealCount={setDealCount}
+            spreadType={spreadType} onSetSpreadType={updateSpreadType} deckArrangement={deckArrangement} onSetDeckArrangement={setDeckArrangement}
+            onReset={resetReading}
+            birthDate={birthDate}
+            onSetBirthDate={setBirthDate}
+          />
+        )} />
       </Routes>
     </BrowserRouter>
   );
-  };
-  export default App;
+};
+export default App;

@@ -588,8 +588,8 @@
 
   .tarot-eye { display: none; }
 
-  .space-vortex {
-    width: 500px;
-    height: 500px;
+  /* Disable heavy blurred elements and animations on mobile to guarantee smooth 60-120 FPS */
+  .space-vortex, .galaxy-layer, .magic-orb {
+    display: none !important;
   }
 }

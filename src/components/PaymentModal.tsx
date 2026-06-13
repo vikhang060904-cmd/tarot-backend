@@ -1,5 +1,6 @@
 import "./PaymentModal.css";
 import { useState, useEffect } from "react";
+import { useLang } from "../i18n/LanguageContext";
 
 type Order = {
   id: number;
@@ -17,24 +18,12 @@ interface PaymentModalProps {
   isOpen: boolean;
   onClose: () => void;
   order: Order | null;
-  onRefreshStatus: () => Promise<void>;
+  onRefreshStatus: (force?: boolean) => Promise<void>;
+  onOpenCheck: () => void;
 }
 
 const formatMoney = (value: number) => {
   return new Intl.NumberFormat("vi-VN").format(value) + " VND";
-};
-
-const getStatusLabel = (status: string) => {
-  switch ((status || "").toLowerCase()) {
-    case "paid":
-      return "Đã thanh toán";
-    case "pending":
-      return "Chờ thanh toán";
-    case "failed":
-      return "Thanh toán thất bại";
-    default:
-      return status || "Không rõ";
-  }
 };
 
 const PaymentModal = ({
@@ -42,7 +31,9 @@ const PaymentModal = ({
   onClose,
   order,
   onRefreshStatus,
+  onOpenCheck,
 }: PaymentModalProps) => {
+  const { lang } = useLang();
   const [loading, setLoading] = useState(false);
   const [qrError, setQrError] = useState(false);
 
@@ -70,10 +61,10 @@ const PaymentModal = ({
 
     try {
       setLoading(true);
-      await onRefreshStatus();
+      await onRefreshStatus(true);
     } catch (err) {
-      console.error("❌ Lỗi kiểm tra:", err);
-      alert("Không thể kiểm tra thanh toán");
+      console.error("❌ Check error:", err);
+      alert(lang === 'vi' ? "Không thể kiểm tra thanh toán" : "Cannot check payment");
     } finally {
       setLoading(false);
     }
@@ -91,16 +82,16 @@ const PaymentModal = ({
           ×
         </button>
 
-        <h2 className="payment-title">Thanh Toán</h2>
+        <h2 className="payment-title">{lang === 'vi' ? 'Thanh Toán' : 'Payment'}</h2>
         <p className="payment-quote">
-          “Kết nối năng lượng, khơi nguồn vận mệnh”
+          {lang === 'vi' ? '“Kết nối năng lượng, khơi nguồn vận mệnh”' : '“Connect energy, unlock destiny”'}
         </p>
 
         <div className="payment-qr-wrap">
           {order.qr_data_url && !qrError ? (
             <img
               src={order.qr_data_url}
-              alt="QR thanh toán"
+              alt={lang === 'vi' ? 'QR thanh toán' : 'Payment QR'}
               className="payment-qr"
               onError={() => {
                 console.error("QR lỗi:", order.qr_data_url);
@@ -109,49 +100,51 @@ const PaymentModal = ({
             />
           ) : (
             <div className="payment-qr-error">
-              <span>Không tải được mã QR</span>
-              <small>Hãy tạo lại đơn hoặc kiểm tra backend</small>
+              <span>{lang === 'vi' ? 'Không tải được mã QR' : 'Cannot load QR code'}</span>
+              <small>{lang === 'vi' ? 'Hãy tạo lại đơn hoặc kiểm tra backend' : 'Please create a new order or check backend'}</small>
             </div>
           )}
         </div>
 
         <div className="payment-info">
           <div className="payment-row">
-            <span>Mã đơn hàng:</span>
+            <span>{lang === 'vi' ? 'Mã đơn hàng:' : 'Order ID:'}</span>
             <strong>#{order.id}</strong>
           </div>
 
           <div className="payment-row">
-            <span>Gói:</span>
+            <span>{lang === 'vi' ? 'Gói:' : 'Package:'}</span>
             <strong>{order.package_name}</strong>
           </div>
 
           <div className="payment-row">
-            <span>Số tiền:</span>
+            <span>{lang === 'vi' ? 'Số tiền:' : 'Amount:'}</span>
             <strong>{formatMoney(order.price_vnd)}</strong>
           </div>
 
           <div className="payment-row">
-            <span>Trạng thái:</span>
+            <span>{lang === 'vi' ? 'Trạng thái:' : 'Status:'}</span>
             <strong className={`payment-status ${order.status}`}>
-              {getStatusLabel(order.status)}
+              {lang === 'vi'
+                ? (order.status === 'paid' ? 'Đã thanh toán' : order.status === 'pending' ? 'Chờ thanh toán' : order.status === 'failed' ? 'Thanh toán thất bại' : order.status)
+                : (order.status === 'paid' ? 'Paid' : order.status === 'pending' ? 'Pending' : order.status === 'failed' ? 'Failed' : order.status)}
             </strong>
           </div>
 
           <div className="payment-row payment-row-top">
-            <span>Nội dung CK:</span>
+            <span>{lang === 'vi' ? 'Nội dung CK:' : 'Transfer note:'}</span>
             <strong className="payment-transfer-code">
               {order.transfer_code}
             </strong>
           </div>
 
           <div className="payment-row">
-            <span>Số tài khoản:</span>
+            <span>{lang === 'vi' ? 'Số tài khoản:' : 'Account no:'}</span>
             <strong>{order.account_no}</strong>
           </div>
 
           <div className="payment-row">
-            <span>Chủ tài khoản:</span>
+            <span>{lang === 'vi' ? 'Chủ tài khoản:' : 'Account name:'}</span>
             <strong>{order.account_name}</strong>
           </div>
         </div>
@@ -162,8 +155,26 @@ const PaymentModal = ({
           onClick={handleCheckPayment}
           disabled={loading}
         >
-          {loading ? "Đang kiểm tra..." : "Kiểm tra thanh toán"}
+          {loading ? (lang === 'vi' ? 'Đang kiểm tra...' : 'Checking...') : (lang === 'vi' ? 'Kiểm tra thanh toán' : 'Check payment')}
         </button>
+
+        <div style={{ textAlign: 'center', marginTop: '15px' }}>
+          <button 
+            type="button"
+            onClick={onOpenCheck}
+            style={{ 
+              background: 'none', 
+              border: 'none', 
+              color: 'var(--gold)', 
+              textDecoration: 'underline', 
+              fontSize: '0.85rem', 
+              cursor: 'pointer',
+              opacity: 0.8
+            }}
+          >
+            {lang === 'vi' ? 'Tôi đã chuyển khoản nhưng chưa được cộng?' : 'Transferred but not credited?'}
+          </button>
+        </div>
       </div>
     </div>
   );

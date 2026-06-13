@@ -11,16 +11,21 @@
 /* stars + fog */
 .stars {
   position: absolute;
-  inset: 0;
-  background: url("https://www.transparenttextures.com/patterns/stardust.png");
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 200%;
+  background: url("https://www.transparenttextures.com/patterns/stardust.png") repeat;
   opacity: 0.25;
   pointer-events: none;
   animation: starsMove 140s linear infinite;
+  will-change: transform;
+  transform: translate3d(0, 0, 0);
 }
 
 @keyframes starsMove {
-  from { background-position: 0 0; }
-  to { background-position: 2200px 0; }
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(-50%, 0, 0); }
 }
 
 .fog {
@@ -34,6 +39,8 @@
   opacity: 0.7;
   animation: fogPulse 8s ease-in-out infinite;
   pointer-events: none;
+  will-change: transform, opacity;
+  backface-visibility: hidden;
 }
 
 @keyframes fogPulse {
@@ -71,6 +78,7 @@
   border: 2px solid rgba(200, 120, 255, 0.35);
   box-shadow: 0 0 45px rgba(170, 0, 255, 0.25), inset 0 0 25px rgba(0, 200, 255, 0.18);
   animation: portalSpin 7s linear infinite;
+  will-change: transform;
 }
 
 @keyframes portalSpin {
@@ -87,6 +95,7 @@
     radial-gradient(circle at 70% 35%, rgba(0, 200, 255, 0.12), transparent 55%);
   filter: blur(1px);
   animation: portalPulse 1.8s ease-in-out infinite;
+  will-change: transform, opacity;
 }
 
 @keyframes portalPulse {
@@ -159,6 +168,7 @@
   border: 1px dashed rgba(200, 120, 255, 0.35);
   box-shadow: 0 0 30px rgba(170, 0, 255, 0.16);
   animation: runeSpin 24s linear infinite;
+  will-change: transform;
 }
 
 @keyframes runeSpin {
@@ -311,7 +321,7 @@
   transform-origin: center center;
   filter: drop-shadow(0 14px 18px rgba(0, 0, 0, 0.45));
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: transform 0.3s ease, filter 0.3s ease, opacity 0.3s ease;
 }
 
 .card-wrap.card-selected {

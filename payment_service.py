@@ -9,9 +9,14 @@ from db import get_conn
 
 load_dotenv()
 
-BANK_BIN = os.getenv("BANK_BIN", "").strip()
-BANK_ACCOUNT_NO = os.getenv("BANK_ACCOUNT_NO", "").strip()
-BANK_ACCOUNT_NAME = os.getenv("BANK_ACCOUNT_NAME", "").strip()
+# Loại bỏ biến toàn cục để tránh cache cũ
+def get_payment_env():
+    load_dotenv(override=True) # Ép nạp lại file .env mới nhất
+    return {
+        "BANK_BIN": os.getenv("BANK_BIN", "970422").strip(),
+        "BANK_ACCOUNT_NO": os.getenv("BANK_ACCOUNT_NO", "").strip(),
+        "BANK_ACCOUNT_NAME": os.getenv("BANK_ACCOUNT_NAME", "").strip(),
+    }
 
 VIETQR_CLIENT_ID = os.getenv("VIETQR_CLIENT_ID", "").strip()
 VIETQR_API_KEY = os.getenv("VIETQR_API_KEY", "").strip()
@@ -37,12 +42,13 @@ PACKAGE_MAP = {
 
 # ================= ENV CHECK =================
 def _require_payment_env():
+    env = get_payment_env()
     missing = []
-    if not BANK_BIN:
+    if not env["BANK_BIN"]:
         missing.append("BANK_BIN")
-    if not BANK_ACCOUNT_NO:
+    if not env["BANK_ACCOUNT_NO"]:
         missing.append("BANK_ACCOUNT_NO")
-    if not BANK_ACCOUNT_NAME:
+    if not env["BANK_ACCOUNT_NAME"]:
         missing.append("BANK_ACCOUNT_NAME")
     if not VIETQR_CLIENT_ID:
         missing.append("VIETQR_CLIENT_ID")
@@ -69,21 +75,26 @@ def _ensure_user_exists(user_email: str):
 
 # ================= UTILS =================
 def _generate_transfer_code(package_code: str):
-    return f"TAROT_{package_code.upper()}_{int(time.time() * 1000)}"
+    # Loại bỏ dấu gạch dưới để tránh lỗi App ngân hàng
+    prefix = package_code.upper().replace("_", "")
+    return f"TAROT{prefix}{int(time.time())}"
 
 
 from urllib.parse import quote
 
 def _create_vietqr_data_url(amount: int, transfer_code: str) -> str:
-    _require_payment_env()
-
-    # 🔥 Encode để tránh lỗi khoảng trắng / ký tự đặc biệt
-    account_name_encoded = quote(BANK_ACCOUNT_NAME.strip())
+    env = get_payment_env()
+    bin_no = env["BANK_BIN"] or "970422"
+    account_no = env["BANK_ACCOUNT_NO"]
+    account_name = env["BANK_ACCOUNT_NAME"]
+    
     transfer_code_encoded = quote(transfer_code.strip())
+    account_name_encoded = quote(account_name.strip())
 
+    # Dùng template compact để có đủ logo và thông tin giúp App dễ nhận diện hơn
     return (
         f"https://img.vietqr.io/image/"
-        f"{BANK_BIN}-{BANK_ACCOUNT_NO}-compact2.png"
+        f"{bin_no}-{account_no}-compact2.png"
         f"?amount={int(amount)}"
         f"&addInfo={transfer_code_encoded}"
         f"&accountName={account_name_encoded}"
@@ -111,6 +122,7 @@ def create_order(user_email: str, package_code: str) -> dict[str, Any]:
     cur = conn.cursor()
 
     try:
+        env = get_payment_env()
         cur.execute("""
             INSERT INTO token_orders (
                 user_email,
@@ -133,9 +145,9 @@ def create_order(user_email: str, package_code: str) -> dict[str, Any]:
             package["token_amount"],
             package["price_vnd"],
             transfer_code,
-            BANK_BIN,
-            BANK_ACCOUNT_NO,
-            BANK_ACCOUNT_NAME,
+            env["BANK_BIN"],
+            env["BANK_ACCOUNT_NO"],
+            env["BANK_ACCOUNT_NAME"],
             qr_data_url,
             "pending",
         ))
@@ -165,6 +177,7 @@ def get_order(order_id: int):
             token_amount,
             price_vnd,
             transfer_code,
+            user_email,
             account_no,
             account_name,
             qr_data_url,
